@@ -20,6 +20,7 @@ the function \code{\link[sensitivity]{sb}} in the \code{sensitivity} package.
 \examples{
 \donttest{
 require("SPOT")
+require("RColorBrewer")
 set.seed(2)
 # Interesting for larger n:
 n <- 2
@@ -44,7 +45,7 @@ sens <- sequentialBifurcation(predictFunKriging,
 
 # Extract group information (variable effects) from sensitivity analysis
 ps <- subgroups(sens)
-colors <- RColorBrewer::brewer.pal(12, "Set3")
+colors <- brewer.pal(12, "Set3")
 barplot(ps$effect, names.arg=ps$group, col= colors)
 }
 

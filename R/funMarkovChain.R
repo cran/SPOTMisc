@@ -93,9 +93,6 @@ evalMarkovChain <- function(x, conf){
 #' @details
 #' Optimization of Continuous Time Markov Chains (MarkovChain) models.
 #'
-#' @param x matrix of four values, i.e., parameters of the MarkovChain model to evaluate with the function.
-#' Rows for points and columns for dimension.
-#' Wrapper for function \code{\link{evalMarkovChain}}.
 #' @param x vector of parameter values, i.e., parameters of the MarkovChain model to evaluate with the function.
 #' \describe{
 #'		\item{\code{p}}{num  [0;1] proportion of confirmed cases}

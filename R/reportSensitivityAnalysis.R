@@ -71,11 +71,13 @@ sequentialBifurcation <- function(fun,
 #'
 #' @param x data
 #'
+#' @importFrom RColorBrewer brewer.pal
 #' @return data frame with group names and effects
 #'
 #' @examples
 #' \donttest{
 #' require("SPOT")
+#' require("RColorBrewer")
 #' set.seed(2)
 #' # Interesting for larger n:
 #' n <- 2
@@ -100,7 +102,7 @@ sequentialBifurcation <- function(fun,
 #'
 #' # Extract group information (variable effects) from sensitivity analysis
 #' ps <- subgroups(sens)
-#' colors <- RColorBrewer::brewer.pal(12, "Set3")
+#' colors <- brewer.pal(12, "Set3")
 #' barplot(ps$effect, names.arg=ps$group, col= colors)
 #' }
 #'
