@@ -8,18 +8,13 @@
 #'
 #' @param x matrix of hyperparameter values to evaluate with the function.
 #' Rows for points and columns for dimension.
-#' @param kerasConf List of additional parameters passed to keras, e.g., \code{verbose:} Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch),
-#' \code{callbacks:}	List of callbacks to be called during training. \code{validation_split:} Float between 0 and 1. Fraction of the training data to be
-#' used as validation data. The model will set apart this fraction of the training data,
-#' will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-#' The validation data is selected from the last samples in the x and y data provided, before shuffling. \code{validation_data:}
-#' 	Data on which to evaluate the loss and any model metrics at the end of each epoch.
-#' The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-#' validation_data will override validation_split. \code{shuffle:} Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-#' "batch" is a special option for dealing with the limitations of HDF5 data;
-#' it shuffles in batch-sized chunks. Has no effect when steps_per_epoch is not NULL.
+#' @param kerasConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
+#' Default: \code{kerasConf = getKerasConf()}.
+#'
 #' @seealso \code{\link{getKerasConf}}
 #' @seealso \code{\link{funKerasMnist}}
+#' @seealso \code{\link[keras]{fit}}
+#'
 #' @return list with function values (loss, accuracy, and keras model information)
 #'
 #' @importFrom SPOT wrapFunction
@@ -63,13 +58,13 @@
 #' @export
 #'
 #'
-evalKerasMnist <- function(x, kerasConf) {
+evalKerasMnist <- function(x, kerasConf = getKerasConf()) {
   FLAGS <- list(
     "dropout" =  x[1],
     "dropoutfact" =  x[2],
     "units" = x[3],
     "unitsfact" = x[4],
-    "lr" =  x[5],
+    "learning_rate" =  x[5],
     "epochs" = x[6],
     "batchsize" = x[7],
     "beta_1" =  x[8],
@@ -124,7 +119,7 @@ evalKerasMnist <- function(x, kerasConf) {
   # Adding the final layer with ten units (classes) and softmax
   model %>% layer_dense(units = 10, activation = 'softmax')
 
-  # decayed_lr = tf.train.exponential_decay(learning_rate,
+  # decayed_learning_rate = tf.train.exponential_decay(learning_rate,
   #            global_step, 10000,
   #          0.95, staircase=True)
 
@@ -132,7 +127,7 @@ evalKerasMnist <- function(x, kerasConf) {
     loss = 'categorical_crossentropy',
     optimizer = optimizer_adam(
       # learning rate (default 1e-3)
-      lr = FLAGS$lr,
+      learning_rate = FLAGS$learning_rate,
       #  	The exponential decay rate for the 1st moment estimates. float, 0 < beta < 1. Generally close to 1.
       beta_1 = FLAGS$beta_1,
       # The exponential decay rate for the 2nd moment estimates. float, 0 < beta < 1. Generally close to 1.
@@ -184,22 +179,19 @@ evalKerasMnist <- function(x, kerasConf) {
 #' @description Hyperparameter Tuning: Keras MNIST Classification Test Function.
 #'
 #' @details Trains a simple deep NN on the MNIST dataset.
+#' Provides a template that can be used for other networks as well.
 #' Standard Code from https://keras.rstudio.com/
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @param x matrix of hyperparameter values to evaluate with the function.
 #' Rows for points and columns for dimension.
-#' @param kConf List of additional parameters passed to keras, e.g., \code{verbose:} Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch),
-#' \code{callbacks:}	List of callbacks to be called during training. \code{validation_split:} Float between 0 and 1. Fraction of the training data to be
-#' used as validation data. The model will set apart this fraction of the training data,
-#' will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-#' The validation data is selected from the last samples in the x and y data provided, before shuffling. \code{validation_data:}
-#' 	Data on which to evaluate the loss and any model metrics at the end of each epoch.
-#' The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-#' validation_data will override validation_split. \code{shuffle:} Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-#' "batch" is a special option for dealing with the limitations of HDF5 data;
-#' it shuffles in batch-sized chunks. Has no effect when steps_per_epoch is not NULL.
+#' @param kConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
+#' Default: \code{kConf = getKerasConf()}.
+#'
 #' @seealso \code{\link{getKerasConf}}
+#' @seealso \code{\link{evalKerasMnist}}
+#' @seealso \code{\link[keras]{fit}}
+#'
 #' @return 1-column matrix with resulting function values (test loss)
 #'
 #' @importFrom SPOT wrapFunction
@@ -260,31 +252,40 @@ evalKerasMnist <- function(x, kerasConf) {
 #' @export
 #'
 #'
-funKerasMnist <- function (x, kConf) {
+funKerasMnist <- function (x, kConf = getKerasConf()) {
   y <- apply(X = x, # matrix
                MARGIN = 1, # margin (apply over rows)
                evalKerasMnist, # function
                kerasConf = kConf)
-  return(matrix(y$testLoss,1,))
+  return(matrix(y[[1]]$testLoss,1,))
 }
 
 
 #' @title Get keras configuration parameter list
 #'
-#' @description Configuration list for Keras
+#' @description Configuration list for \code{keras}'s \code{\link[keras]{fit}} function.
 #'
-#' @details Additional parameters passed to keras, e.g., \code{verbose:} Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch),
-#' \code{callbacks:}	List of callbacks to be called during training. \code{validation_split:} Float between 0 and 1. Fraction of the training data to be
-#' used as validation data. The model will set apart this fraction of the training data,
-#' will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-#' The validation data is selected from the last samples in the x and y data provided, before shuffling. \code{validation_data:}
-#' 	Data on which to evaluate the loss and any model metrics at the end of each epoch.
-#' The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-#' validation_data will override validation_split. \code{shuffle:} Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-#' "batch" is a special option for dealing with the limitations of HDF5 data;
-#' it shuffles in batch-sized chunks. Has no effect when steps_per_epoch is not NULL.
+#' @details Additional parameters passed to \code{keras}, e.g.,
+#' \describe{
+#'		\item{\code{verbose:}}{Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch). Default: \code{0}.}
+#'		\item{\code{callbacks:}}{List of callbacks to be called during training. Default: \code{list()}.}
+#'		\item{\code{validation_split:}}{Float between 0 and 1. Fraction of the training data to be
+#'          used as validation data. The model will set apart this fraction of the training data,
+#'          will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
+#'          The validation data is selected from the last samples in the x and y data provided, before shuffling. Default: \code{0.2}.}
+#'    \item{\code{validation_data:}}{Data on which to evaluate the loss and any model metrics at the end of each epoch.
+#'     The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
+#'      validation_data will override validation_split. Default: \code{NULL}.}
+#'    \item{\code{shuffle:}}{Logical (whether to shuffle the training data before each epoch) or string (for "batch").
+#'    "batch" is a special option for dealing with the limitations of HDF5 data; it shuffles in batch-sized chunks.
+#'    Has no effect when steps_per_epoch is not NULL. Default: \code{FALSE}.}
+#'    }
 #'
-#' @return control list (kerasConf)
+#' @return kerasConf \code{list} with configuration parameters.
+#'
+#' @seealso \code{\link{evalKerasMnist}}
+#' @seealso \code{\link{funKerasMnist}}
+#' @seealso \code{\link[keras]{fit}}
 #'
 #' @export
 getKerasConf <- function() {

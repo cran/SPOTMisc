@@ -7,20 +7,32 @@
 getKerasConf()
 }
 \value{
-control list (kerasConf)
+kerasConf \code{list} with configuration parameters.
 }
 \description{
-Configuration list for Keras
+Configuration list for \code{keras}'s \code{\link[keras]{fit}} function.
 }
 \details{
-Additional parameters passed to keras, e.g., \code{verbose:} Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch),
-\code{callbacks:}	List of callbacks to be called during training. \code{validation_split:} Float between 0 and 1. Fraction of the training data to be
-used as validation data. The model will set apart this fraction of the training data,
-will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-The validation data is selected from the last samples in the x and y data provided, before shuffling. \code{validation_data:}
-	Data on which to evaluate the loss and any model metrics at the end of each epoch.
-The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-validation_data will override validation_split. \code{shuffle:} Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-"batch" is a special option for dealing with the limitations of HDF5 data;
-it shuffles in batch-sized chunks. Has no effect when steps_per_epoch is not NULL.
+Additional parameters passed to \code{keras}, e.g.,
+\describe{
+	\item{\code{verbose:}}{Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch). Default: \code{0}.}
+	\item{\code{callbacks:}}{List of callbacks to be called during training. Default: \code{list()}.}
+	\item{\code{validation_split:}}{Float between 0 and 1. Fraction of the training data to be
+         used as validation data. The model will set apart this fraction of the training data,
+         will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
+         The validation data is selected from the last samples in the x and y data provided, before shuffling. Default: \code{0.2}.}
+   \item{\code{validation_data:}}{Data on which to evaluate the loss and any model metrics at the end of each epoch.
+    The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
+     validation_data will override validation_split. Default: \code{NULL}.}
+   \item{\code{shuffle:}}{Logical (whether to shuffle the training data before each epoch) or string (for "batch").
+   "batch" is a special option for dealing with the limitations of HDF5 data; it shuffles in batch-sized chunks.
+   Has no effect when steps_per_epoch is not NULL. Default: \code{FALSE}.}
+   }
+}
+\seealso{
+\code{\link{evalKerasMnist}}
+
+\code{\link{funKerasMnist}}
+
+\code{\link[keras]{fit}}
 }

@@ -4,22 +4,14 @@
 \alias{evalKerasMnist}
 \title{evalKerasMnist}
 \usage{
-evalKerasMnist(x, kerasConf)
+evalKerasMnist(x, kerasConf = getKerasConf())
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
 Rows for points and columns for dimension.}
 
-\item{kerasConf}{List of additional parameters passed to keras, e.g., \code{verbose:} Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch),
-\code{callbacks:}    List of callbacks to be called during training. \code{validation_split:} Float between 0 and 1. Fraction of the training data to be
-used as validation data. The model will set apart this fraction of the training data,
-will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-The validation data is selected from the last samples in the x and y data provided, before shuffling. \code{validation_data:}
-    Data on which to evaluate the loss and any model metrics at the end of each epoch.
-The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-validation_data will override validation_split. \code{shuffle:} Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-"batch" is a special option for dealing with the limitations of HDF5 data;
-it shuffles in batch-sized chunks. Has no effect when steps_per_epoch is not NULL.}
+\item{kerasConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
+Default: \code{kerasConf = getKerasConf()}.}
 }
 \value{
 list with function values (loss, accuracy, and keras model information)
@@ -62,4 +54,6 @@ res$modelConf$config$layers[,2]$units
 \code{\link{getKerasConf}}
 
 \code{\link{funKerasMnist}}
+
+\code{\link[keras]{fit}}
 }

@@ -98,6 +98,21 @@ trans_10pow <- function(x) {
 }
 
 
+#' @title 10 power x transformation
+#' @description
+#' Parameter values x are transformed to \code{1-10^x}.
+#' This is helpful for parameters that are likely to be set very close to (but below) a value of 1, 
+#' such as discount factors in reinforcement learning.
+#'
+#' @param x input
+#' @return \code{1-10^x}
+#'
+#' @export
+trans_1minus10pow <- function(x) {
+  1 - (10 ^ x)
+}
+
+
 #' @title 10 power x transformation with round
 #'
 #' @description

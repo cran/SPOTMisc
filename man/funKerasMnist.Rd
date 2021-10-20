@@ -4,22 +4,14 @@
 \alias{funKerasMnist}
 \title{funKerasMnist}
 \usage{
-funKerasMnist(x, kConf)
+funKerasMnist(x, kConf = getKerasConf())
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
 Rows for points and columns for dimension.}
 
-\item{kConf}{List of additional parameters passed to keras, e.g., \code{verbose:} Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch),
-\code{callbacks:}    List of callbacks to be called during training. \code{validation_split:} Float between 0 and 1. Fraction of the training data to be
-used as validation data. The model will set apart this fraction of the training data,
-will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-The validation data is selected from the last samples in the x and y data provided, before shuffling. \code{validation_data:}
-    Data on which to evaluate the loss and any model metrics at the end of each epoch.
-The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-validation_data will override validation_split. \code{shuffle:} Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-"batch" is a special option for dealing with the limitations of HDF5 data;
-it shuffles in batch-sized chunks. Has no effect when steps_per_epoch is not NULL.}
+\item{kConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
+Default: \code{kConf = getKerasConf()}.}
 }
 \value{
 1-column matrix with resulting function values (test loss)
@@ -29,6 +21,7 @@ Hyperparameter Tuning: Keras MNIST Classification Test Function.
 }
 \details{
 Trains a simple deep NN on the MNIST dataset.
+Provides a template that can be used for other networks as well.
 Standard Code from https://keras.rstudio.com/
 Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 }
@@ -78,4 +71,8 @@ res <- spot(x = NULL,
 }
 \seealso{
 \code{\link{getKerasConf}}
+
+\code{\link{evalKerasMnist}}
+
+\code{\link[keras]{fit}}
 }
