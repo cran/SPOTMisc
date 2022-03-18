@@ -2,7 +2,7 @@
 % Please edit documentation in R/mlrTools.R
 \name{get_objf}
 \alias{get_objf}
-\title{Get objective function}
+\title{Get objective function for mlr}
 \usage{
 get_objf(config, timeout = 3600)
 }
@@ -12,7 +12,11 @@ get_objf(config, timeout = 3600)
 \item{timeout}{integer, time in seconds after which a model (learner) evaluation will be aborted.}
 }
 \value{
-an objective function that can be optimized via \code{\link[SPOT]{spot}}
+an objective function that can be optimized via \code{\link[SPOT]{spot}}.
+It basically provides the result from a call to \code{\link[mlr]{resample}}:
+\code{resample(lrn, task, resample, measures = measures, show.info = FALSE)},
+with measures defined as \code{rmse}, \code{timeboth}, \code{timetrain}, and
+\code{timepredict}.
 }
 \description{
 mlrTools

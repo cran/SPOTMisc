@@ -16,5 +16,5 @@
 #'   \item{ybestVec}{num}
 #'  }
 #'
-"resKerasMnist02"
+"resKerasMnist02Default"
 

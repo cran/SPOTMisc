@@ -1,8 +1,8 @@
-#' @title Results from a very simple SPOT run, version 2, with replicates
+#' @title Results from a very simple SPOT run, version 7, with replicates
 #'
 #' @description  Details and the corresponding R code to generate the data
 #' can be found in the package vignette \code{SPOTMiscVignette.Rmd}.
-#'
+#
 #' @format A list of 9 values
 #' \describe{
 #'   \item{xbest}{num:}
@@ -16,5 +16,5 @@
 #'   \item{ybestVec}{num}
 #'  }
 #'
-"resKerasMnist02"
+"resKerasMnist07"
 

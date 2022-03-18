@@ -4,7 +4,7 @@
 \alias{funKerasMnist}
 \title{funKerasMnist}
 \usage{
-funKerasMnist(x, kConf = getKerasConf())
+funKerasMnist(x, kConf = getKerasConf(), data = getMnistData())
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
@@ -12,6 +12,8 @@ Rows for points and columns for dimension.}
 
 \item{kConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
 Default: \code{kConf = getKerasConf()}.}
+
+\item{data}{mnist data set. Default: \code{\link{getMnistData}}.}
 }
 \value{
 1-column matrix with resulting function values (test loss)

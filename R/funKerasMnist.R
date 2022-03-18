@@ -10,26 +10,22 @@
 #' Rows for points and columns for dimension.
 #' @param kerasConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
 #' Default: \code{kerasConf = getKerasConf()}.
+#' @param data mnist data set. Default: \code{\link{getMnistData}}.
 #'
 #' @seealso \code{\link{getKerasConf}}
 #' @seealso \code{\link{funKerasMnist}}
 #' @seealso \code{\link[keras]{fit}}
 #'
-#' @return list with function values (loss, accuracy, and keras model information)
+#' @return list with function values (training, validation, and test loss/accuracy,
+#' and keras model information)
 #'
-#' @importFrom SPOT wrapFunction
-#' @importFrom keras dataset_mnist
 #' @importFrom keras fit
-#' @importFrom keras array_reshape
-#' @importFrom keras to_categorical
 #' @importFrom keras keras_model_sequential
 #' @importFrom keras layer_dense
 #' @importFrom keras layer_dropout
 #' @importFrom keras compile
 #' @importFrom keras optimizer_adam
 #' @importFrom keras evaluate
-#' @importFrom keras model_to_json
-#' @importFrom jsonlite fromJSON
 #' @examples
 #' \donttest{
 #' ### These examples require an activated Python environment as described in
@@ -58,120 +54,171 @@
 #' @export
 #'
 #'
-evalKerasMnist <- function(x, kerasConf = getKerasConf()) {
-  FLAGS <- list(
-    "dropout" =  x[1],
-    "dropoutfact" =  x[2],
-    "units" = x[3],
-    "unitsfact" = x[4],
-    "learning_rate" =  x[5],
-    "epochs" = x[6],
-    "batchsize" = x[7],
-    "beta_1" =  x[8],
-    "beta_2" =  x[9],
-    "layers" =  x[10],
-    "epsilon" = x[11]
-  )
+evalKerasMnist <-
+  function(x,
+           kerasConf = getKerasConf(),
+           data = getMnistData()) {
+    FLAGS <- list(
+      "dropout" =  x[1],
+      "dropoutfact" =  x[2],
+      "units" = x[3],
+      "unitsfact" = x[4],
+      "learning_rate" =  x[5],
+      "epochs" = x[6],
+      "batchsize" = x[7],
+      "beta_1" =  x[8],
+      "beta_2" =  x[9],
+      "layers" =  x[10],
+      "epsilon" = x[11]
+    )
 
-  # Data Preparation
-  mnist <- dataset_mnist()
-  x_train <- mnist$train$x
-  y_train <- mnist$train$y
-  x_test <- mnist$test$x
-  y_test <- mnist$test$y
-
-  x_train <- array_reshape(x_train, c(nrow(x_train), 28 * 28))
-  x_test <- array_reshape(x_test, c(nrow(x_test), 28 * 28))
-
-  # Transform RGB values into [0,1] range
-  x_train <- x_train / 255
-  x_test <- x_test / 255
-
-  # Convert class vectors to binary class matrices
-  y_train <- to_categorical(y_train, 10)
-  y_test <- to_categorical(y_test, 10)
-
-  # Define Model
-
-  model <- keras_model_sequential()
-  units <- FLAGS$units
-  dropout <- FLAGS$dropout
-
-  model %>%
-    layer_dense(units = units,
-                activation = 'relu',
-                input_shape = c(784)) %>%
-    layer_dropout(rate = dropout)
-
-  for (i in 1:FLAGS$layers) {
-    dropout <- dropout * FLAGS$dropoutfact
-    if (as.integer(units * FLAGS$unitsfact) > 10) {
-      units <- as.integer(units * FLAGS$unitsfact)
+    if (kerasConf$verbose > 0) {
+      printf("dropout: %f", FLAGS$dropout)
+      printf("dropoutfac: %f", FLAGS$dropoutfac)
+      printf("units: %1.0f", FLAGS$units)
+      printf("unitsfac: %f", FLAGS$unitsfact)
+      printf("learning_rate: %f", FLAGS$learning_rate)
+      printf("epochs: %1.0f", FLAGS$epochs)
+      printf("batchsize: %1.0f", FLAGS$batchsize)
+      printf("beta_1: %f", FLAGS$beta_1)
+      printf("beta_2: %f", FLAGS$beta_2)
+      printf("layers: %1.0f", FLAGS$layers)
+      printf("epsilon: %f", FLAGS$epsilon)
     }
 
-    model %>% layer_dense(units = units, activation = 'relu')
-    if (dropout != 0) {
-      model %>% layer_dropout(rate = dropout)
-    }
+    if (kerasConf$resDummy)
+    {
+      y <- matrix(
+        runif(6, min = FLAGS$dropout, max = 1 + FLAGS$dropout),
+        nrow = 1,
+        ncol = 6
+      )
+      y <- kerasCompileResult(y = y, kerasConf = kerasConf)
+      message("evalKerasMnist(): Returning dummy value for testing.")
+      return(y)
+    } else{
+      # Data Preparation
+      x_train <- data$x_train
+      y_train <- data$y_train
+      x_test <- data$x_test
+      y_test <- data$y_test
 
+      # Define Model
+      model <- keras_model_sequential()
+      units <- FLAGS$units
+      dropout <- FLAGS$dropout
+
+      # 1st hidden layer with input shape
+      model %>%
+        layer_dense(
+          units = units,
+          activation = 'relu',
+          input_shape = c(784)
+        ) %>%
+        layer_dropout(rate = dropout)
+
+      for (i in 2:FLAGS$layers) {
+        # dropout changed for next layer
+        dropout <- dropout * FLAGS$dropoutfact
+        if (kerasConf$verbose > 0) {
+          printf("Dropout rate %f in layer %1.0f", dropout, i)
+        }
+        # unit changed for next layer
+        # hidden layer unit should not cross output layer length i.e. 10
+        units <- max(as.integer(units * FLAGS$unitsfact), 10)
+        # add dense layer
+        model %>% layer_dense(units = units, activation = 'relu')
+        if (dropout != 0) {
+          # add dropout layer
+          model %>% layer_dropout(rate = dropout)
+        }
+      }
+
+      # Adding the final layer with ten units (classes) and softmax
+      model %>% layer_dense(units = 10, activation = 'softmax')
+
+      # decayed_learning_rate = tf.train.exponential_decay(learning_rate,
+      #            global_step, 10000,
+      #          0.95, staircase=True)
+
+      model %>% compile(
+        loss = 'categorical_crossentropy',
+        optimizer = optimizer_adam(
+          # learning rate (default 1e-3)
+          learning_rate = FLAGS$learning_rate,
+          #  	The exponential decay rate for the 1st moment estimates. float, 0 < beta < 1. Generally close to 1.
+          beta_1 = FLAGS$beta_1,
+          # The exponential decay rate for the 2nd moment estimates. float, 0 < beta < 1. Generally close to 1.
+          beta_2 = FLAGS$beta_2,
+          # Fuzz factor. If NULL, defaults to k_epsilon(). (default NULL)
+          epsilon = FLAGS$epsilon,
+          # Learning rate decay over each update. (default 0)
+          decay = 0,
+          # Whether to apply the AMSGrad variant of this algorithm from the paper "On the Convergence of Adam and Beyond"
+          amsgrad = FALSE,
+          # Gradients will be clipped when their L2 norm exceeds this value.
+          clipnorm = NULL,
+          # Gradients will be clipped when their absolute value exceeds this value.
+          clipvalue = NULL
+        ),
+        metrics = c('accuracy')
+      )
+      if (kerasConf$verbose > 0) {
+        print(model)
+      }
+
+      # Training & Evaluation
+      history <- model %>% fit(
+        x_train,
+        y_train,
+        batch_size = FLAGS$batchsize,
+        epochs = FLAGS$epochs,
+        verbose = kerasConf$verbose,
+        validation_split = kerasConf$validation_split,
+        shuffle = kerasConf$shuffle
+      )
+
+      if (kerasConf$verbose > 0) {
+        cat('val loss:', history$metrics$val_loss , '\n')
+        cat('val accuracy:',  history$metrics$val_acc, '\n')
+        plot(history)
+      }
+
+      # evaluate on test data
+      score <- model %>% evaluate(x_test, y_test,
+                                  verbose = kerasConf$verbose)
+
+      ## y: matrix with six entries:
+      # trainingLoss,  negTrainingAccuracy,
+      # validationLoss,  negValidationAccuracy,
+      # testLoss,  negTestAccuracy:
+      y <- matrix(
+        c(
+          history$metrics$loss[length(history$metrics$loss)],-history$metrics$accuracy[length(history$metrics$accuracy)],
+          history$metrics$val_loss[length(history$metrics$val_loss)],-history$metrics$val_accuracy[length(history$metrics$val_accuracy)],
+          score[[1]],-score[[2]]
+        ),
+        nrow = 1,
+        ncol = 6
+      )
+
+      if (kerasConf$verbose > 0) {
+        message("funKerasMnist: y matrix before kerasCompileResult()")
+        print(y)
+      }
+      y <- kerasCompileResult(y = y, kerasConf = kerasConf)
+
+      if (kerasConf$verbose > 0) {
+        message("funKerasMnist: y matrix after kerasCompileResult()")
+        print(y)
+      }
+
+      if (kerasConf$clearSession) {
+        keras::k_clear_session()
+      }
+      return(y)
+    }
   }
-
-  # Adding the final layer with ten units (classes) and softmax
-  model %>% layer_dense(units = 10, activation = 'softmax')
-
-  # decayed_learning_rate = tf.train.exponential_decay(learning_rate,
-  #            global_step, 10000,
-  #          0.95, staircase=True)
-
-  model %>% compile(
-    loss = 'categorical_crossentropy',
-    optimizer = optimizer_adam(
-      # learning rate (default 1e-3)
-      learning_rate = FLAGS$learning_rate,
-      #  	The exponential decay rate for the 1st moment estimates. float, 0 < beta < 1. Generally close to 1.
-      beta_1 = FLAGS$beta_1,
-      # The exponential decay rate for the 2nd moment estimates. float, 0 < beta < 1. Generally close to 1.
-      beta_2 = FLAGS$beta_2,
-      # Fuzz factor. If NULL, defaults to k_epsilon(). (default NULL)
-      epsilon = FLAGS$epsilon,
-      # Learning rate decay over each update. (default 0)
-      decay = 0,
-      # Whether to apply the AMSGrad variant of this algorithm from the paper "On the Convergence of Adam and Beyond"
-      amsgrad = FALSE,
-      # Gradients will be clipped when their L2 norm exceeds this value.
-      clipnorm = NULL,
-      # Gradients will be clipped when their absolute value exceeds this value.
-      clipvalue = NULL
-    ),
-    metrics = c('accuracy')
-  )
-  # print(model)
-
-  # Training & Evaluation
-  history <- model %>% fit(
-    x_train,
-    y_train,
-    batch_size = 2 ^ FLAGS$batchsize,
-    epochs = FLAGS$epochs,
-    verbose = kerasConf$verbose,
-    validation_split = kerasConf$validation_split,
-    shuffle = kerasConf$shuffle
-  )
-
-  # cat('val loss:', history$metrics$val_loss , '\n')
-  # cat('val accuracy:',  history$metrics$val_acc, '\n')
-  # plot(history)
-
-  score <- model %>% evaluate(x_test, y_test,
-                              verbose = kerasConf$verbose)
-  cat('Test loss:', score[[1]], '\n')
-  cat('Test accuracy:', score[[2]], '\n')
-
-  result <- list(testLoss = score[[1]],
-                 testAcc = score[[2]],
-                 modelConf = fromJSON(model_to_json(model)))
-  return(result)
-}
 
 
 #' @title funKerasMnist
@@ -187,6 +234,7 @@ evalKerasMnist <- function(x, kerasConf = getKerasConf()) {
 #' Rows for points and columns for dimension.
 #' @param kConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
 #' Default: \code{kConf = getKerasConf()}.
+#' @param data mnist data set. Default: \code{\link{getMnistData}}.
 #'
 #' @seealso \code{\link{getKerasConf}}
 #' @seealso \code{\link{evalKerasMnist}}
@@ -194,11 +242,7 @@ evalKerasMnist <- function(x, kerasConf = getKerasConf()) {
 #'
 #' @return 1-column matrix with resulting function values (test loss)
 #'
-#' @importFrom SPOT wrapFunction
-#' @importFrom keras dataset_mnist
 #' @importFrom keras fit
-#' @importFrom keras array_reshape
-#' @importFrom keras to_categorical
 #' @importFrom keras keras_model_sequential
 #' @importFrom keras layer_dense
 #' @importFrom keras layer_dropout
@@ -250,51 +294,21 @@ evalKerasMnist <- function(x, kerasConf = getKerasConf()) {
 #' }
 #'
 #' @export
-#'
-#'
-funKerasMnist <- function (x, kConf = getKerasConf()) {
-  y <- apply(X = x, # matrix
-               MARGIN = 1, # margin (apply over rows)
-               evalKerasMnist, # function
-               kerasConf = kConf)
-  return(matrix(y[[1]]$testLoss,1,))
-}
-
-
-#' @title Get keras configuration parameter list
-#'
-#' @description Configuration list for \code{keras}'s \code{\link[keras]{fit}} function.
-#'
-#' @details Additional parameters passed to \code{keras}, e.g.,
-#' \describe{
-#'		\item{\code{verbose:}}{Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch). Default: \code{0}.}
-#'		\item{\code{callbacks:}}{List of callbacks to be called during training. Default: \code{list()}.}
-#'		\item{\code{validation_split:}}{Float between 0 and 1. Fraction of the training data to be
-#'          used as validation data. The model will set apart this fraction of the training data,
-#'          will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-#'          The validation data is selected from the last samples in the x and y data provided, before shuffling. Default: \code{0.2}.}
-#'    \item{\code{validation_data:}}{Data on which to evaluate the loss and any model metrics at the end of each epoch.
-#'     The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-#'      validation_data will override validation_split. Default: \code{NULL}.}
-#'    \item{\code{shuffle:}}{Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-#'    "batch" is a special option for dealing with the limitations of HDF5 data; it shuffles in batch-sized chunks.
-#'    Has no effect when steps_per_epoch is not NULL. Default: \code{FALSE}.}
-#'    }
-#'
-#' @return kerasConf \code{list} with configuration parameters.
-#'
-#' @seealso \code{\link{evalKerasMnist}}
-#' @seealso \code{\link{funKerasMnist}}
-#' @seealso \code{\link[keras]{fit}}
-#'
-#' @export
-getKerasConf <- function() {
-  kerasConf <- list(
-    verbose = 0,
-    callbacks = list(),
-    validation_split = 0.2,
-    validation_data = NULL,
-    shuffle = FALSE
-  )
-  return(kerasConf)
-}
+funKerasMnist <-
+  function (x, kConf = getKerasConf(), data = getMnistData()) {
+    y <- matrix(apply(
+      X = x,
+      # matrix
+      MARGIN = 1,
+      # margin (apply over rows)
+      evalKerasMnist,
+      # function
+      kerasConf = kConf
+    ),
+    nrow = nrow(x),
+    byrow = TRUE)
+    if (is.numeric(kConf$naDummy)) {
+      y[is.na(y) | is.infinite(y)] <- kConf$naDummy
+    }
+    return(y)
+  }

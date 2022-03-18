@@ -1,4 +1,6 @@
-#' @title Results from a very simple SPOT run, version 2, with replicates
+#' @title Results from a SPOT run, version 5, with replicates: negValidationAccuracy
+#'
+#' @description  SPOT results: resKerasTransferLearning05
 #'
 #' @description  Details and the corresponding R code to generate the data
 #' can be found in the package vignette \code{SPOTMiscVignette.Rmd}.
@@ -16,5 +18,5 @@
 #'   \item{ybestVec}{num}
 #'  }
 #'
-"resKerasMnist02"
+"resKerasTransferLearning05"
 

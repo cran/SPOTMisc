@@ -1,7 +1,10 @@
-#' @title Results from a very simple SPOT run, version 2, with replicates
+#' @title Results from a SPOT run, version 4, with replicates
+#'
+#' @description  SPOT results: resKerasTransferLearning04
 #'
 #' @description  Details and the corresponding R code to generate the data
 #' can be found in the package vignette \code{SPOTMiscVignette.Rmd}.
+#'
 #'
 #' @format A list of 9 values
 #' \describe{
@@ -16,5 +19,5 @@
 #'   \item{ybestVec}{num}
 #'  }
 #'
-"resKerasMnist02"
+"resKerasTransferLearning04"
 

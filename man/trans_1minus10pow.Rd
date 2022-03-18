@@ -14,6 +14,6 @@ trans_1minus10pow(x)
 }
 \description{
 Parameter values x are transformed to \code{1-10^x}.
-This is helpful for parameters that are likely to be set very close to (but below) a value of 1, 
+This is helpful for parameters that are likely to be set very close to (but below) a value of 1,
 such as discount factors in reinforcement learning.
 }

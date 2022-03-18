@@ -1,7 +1,7 @@
 Package: SPOTMisc
 Type: Package
 Title: Misc Extensions for the 'SPOT' Package
-Version: 1.2.18
+Version: 1.7.0
 Authors@R: c(	
         person("Thomas", "Bartz-Beielstein", role = c("aut", "cre"), email = "tbb@bartzundbartz.de", comment = c(ORCID = "0000-0002-5938-5158")),
 				person("Martin", "Zaefferer", role = "aut", comment = c(ORCID = "0000-0003-2372-2092")),
@@ -20,19 +20,21 @@ License: GPL (>= 2)
 Encoding: UTF-8
 LazyLoad: yes
 LazyData: true
-Date: 2021-10-19
+Date: 2022-03-13
 Depends: R (>= 4.0.0)
 RoxygenNote: 7.1.2
 Imports: benchmarkme, callr, emoa, ggsci, graphics, grDevices,
-        jsonlite, keras, mlr, plotly, RColorBrewer, rpart.plot,
-        sensitivity, SimInf, smoof, SPOT, stats, utils
-Suggests: babsim.hospital, knitr, rmarkdown, testthat
+        jsonlite, keras, magrittr, mlr, OpenML, plotly, RColorBrewer,
+        reticulate, rpart.plot, sensitivity, smoof, SPOT, stats,
+        tensorflow, tfdatasets, utils
+Suggests: knitr, rmarkdown, testthat
 URL: https://www.spotseven.de
+VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2021-10-20 13:37:54 UTC; bartz
+Packaged: 2022-03-18 11:29:57 UTC; bartz
 Author: Thomas Bartz-Beielstein [aut, cre]
     (<https://orcid.org/0000-0002-5938-5158>),
   Martin Zaefferer [aut] (<https://orcid.org/0000-0003-2372-2092>),
   Frederik Rehbach [aut] (<https://orcid.org/0000-0003-0922-8629>)
 Repository: CRAN
-Date/Publication: 2021-10-20 14:00:02 UTC
+Date/Publication: 2022-03-18 11:50:02 UTC
