@@ -23,6 +23,7 @@ spotPlot provides a higher level of abstraction and the users can use every plot
 function only by calling spotPlot.
 }
 \examples{
+\donttest{
 library("SPOT")
 set.seed(1)                              # seed
 k <- 30                                  # sample number
@@ -37,7 +38,7 @@ spotPlot(plotType="fun", f=function(x){rowSums(x^2)},
    lower=c(-10,0), upper=c(15,10), type="filled.contour")
 spotPlot(plotType = "parallel", object=fit)
 spotPlot(plotType = "sensitivity", object=result)
-
+}
 }
 \seealso{
 \code{\link[SPOT]{plotData}}
@@ -47,5 +48,5 @@ spotPlot(plotType = "sensitivity", object=result)
 \code{\link[SPOT]{plotFunction}}
 }
 \author{
-Alpar Gür \email{alpar.guer@smail.th-koeln.de}
+Alpar Guer \email{alpar.guer@smail.th-koeln.de}
 }

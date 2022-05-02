@@ -34,8 +34,10 @@ Learning and Stochastic
 Optimization](https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf).
 }
 \note{
-It is recommended to leave the parameters of this optimizer at their
-  default values.
+To enable compatibility with the ranges of the learning rates
+of the other optimizers, the learning rate \code{learning_rate}
+is internally mapped to \code{10 * learning_rate}. That is,
+a learning rat of 0.001 will be mapped to 0.01 (which is the default.)
 }
 \seealso{
 Other optimizers: 

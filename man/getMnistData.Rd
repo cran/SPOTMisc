@@ -11,7 +11,7 @@ getMnistData(kerasConf = getKerasConf())
 Default: \code{kerasConf = getKerasConf()}.}
 }
 \value{
-list with training, validation, and test data
+list with training and test data
 }
 \description{
 getMnistData

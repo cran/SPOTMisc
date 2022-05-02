@@ -8,38 +8,69 @@
 #'
 #' @param task.type character, either "classif" or "regr".
 #' @param nobs integer, number of observations uniformly sampled from the full data set.
-#' @param nfactors character, controls the number of factors (categorical features) to use. Can be "low", "med", "high", or "full" (full corresponds to original data set).
-#' @param nnumericals character, controls the number of numerical features to use. Can be "low", "med", "high", or "full" (full corresponds to original data set).
-#' @param cardinality character, controls the number of factor levels (categories) for the categorical features. Can be "low", "med", "high" (high corresponds to original data set).
-#' @param data.seed integer, this will be used via set.seed() to make the random subsampling reproducible. Will not have an effect if all observations are used.
-#' @param cachedir the cache directory.
+#' @param nfactors character, controls the number of factors (categorical features) to use.
+#' Can be "low", "med", "high", or "full" (full corresponds to original data set).
+#' @param nnumericals character, controls the number of numerical features to use.
+#' Can be "low", "med", "high", or "full" (full corresponds to original data set).
+#' @param cardinality character, controls the number of factor levels (categories)
+#' for the categorical features. Can be "low", "med", "high" (high corresponds to original data set).
+#' @param data.seed integer, this will be used via set.seed() to make the random subsampling reproducible.
+#'  Will not have an effect if all observations are used.
+#' @param cachedir character. The cache directory, e.g., \code{"oml.cache"}.
+#' Default: \code{"oml.cache"}.
+#' @param cache.only logical. Only try to retrieve the object from cache.
+#' Will result in error if the object is not found. Default is TRUE.
+#' @param target character "age" or "income_class". If \code{target = age}, the
+#' numerical varible \code{age} is converted to a factor:
+#' \code{age<-as.factor(age<40)}
 #'
-#' @return an mlr task with the respective data set
+#' @return census data set
+#'
+#' @import OpenML
+#'
+#' @examples
+#' \donttest{
+#' ## Example downloads OpenML data, might take some time:
+#' task.type <- "classif"
+#' nobs <- 1e4 # max: 229285
+#' data.seed <- 1
+#' nfactors <- "full"
+#' nnumericals <- "low"
+#' cardinality <- "med"
+#' censusData <- getDataCensus(
+#'   task.type = task.type,
+#'   nobs = nobs,
+#'   nfactors = nfactors,
+#'   nnumericals = nnumericals,
+#'   cardinality = cardinality,
+#'   data.seed = data.seed,
+#'   cachedir = "oml.cache",
+#'   target="age")
+#'   }
 #'
 #' @export
-#' @import OpenML
-#' @import mlr
-get_task_census <- function(task.type="classif",
+getDataCensus <- function(task.type="classif",
                           nobs=50000,
                           nfactors = "high",
                           nnumericals = "high",
                           cardinality = "high",
                           data.seed=1,
-                          cachedir="../oml.cache"
+                          cachedir="oml.cache",
+                          target = NULL,
+                          cache.only = FALSE
                           ){
   ## set API key to read only key
   setOMLConfig(apikey = "c1994bdb7ecb3c6f3c8f3b35f4b47f1f",
                cachedir = cachedir) # default cachedir is only temporary.
 
   ## load CENSUS data
-  dataset <- getOMLDataSet(4535)$data
-
+  dataset <- getOMLDataSet(data.id=4535,
+                           cache.only=cache.only)$data
 
   if(is.na(cardinality))
     cardinality <- "low"
 
-
-  #Note: for slightly better balance, we could also restrict the dataset to >18yold
+    #Note: for slightly better balance, we could also restrict the dataset to >18yold
   #dataset <- subset(dataset,subset=V1>18)
 
   ## target column, to be ignored during task variation
@@ -54,9 +85,12 @@ get_task_census <- function(task.type="classif",
     #summary(dataset$V19)
     #dataset$V19 <- as.factor(dataset$V19>0)
     #target <- "income_class"
-    target <- "age"
-    summary(dataset$V1)
+    ## FIXME commented?
+    #target <- "age"
+    if(target == "age"){
+      message("getDataCensus: Converting target age to factor.")
     dataset$V1 <- as.factor(dataset$V1<40)
+    }
   }else if(task.type=="regr"){
     #target <- "capital_gains"
     #target <- "wage_per_hour"
@@ -73,17 +107,10 @@ get_task_census <- function(task.type="classif",
 
   ## specify properties of the data set variation
 
-
-
-
-
-  #######################################
   ## age AAGE
   #summary(dataset$V1)
   ## numeric
-  #######################################
 
-  #######################################
   ## class of worker ACLSWKR
   #table(dataset$V2)
   translations <- list(government = c(" Federal government"," Local government", " State government"),
@@ -94,9 +121,9 @@ get_task_census <- function(task.type="classif",
     dataset$V2 <- translate_levels(dataset$V2,translations)
   }
   ## reduction: 9 ->  4
-  #######################################
 
-  #######################################
+
+
   ## industry code ADTIND
   ### should be factor not integer
   dataset$V3 <- as.factor(dataset$V3)
@@ -106,9 +133,9 @@ get_task_census <- function(task.type="classif",
   }
   ## reduction: 52 -> 0
   ## remove, becomes redundant with V9
-  #######################################
 
-  #######################################
+
+
   ## occupation code ADTOCC
   ### should be facor not integer
   dataset$V4 <- as.factor(dataset$V4)
@@ -118,9 +145,9 @@ get_task_census <- function(task.type="classif",
   }
   ## reduction: 46 -> 0
   ## remove, becomes redundant with V10
-  #######################################
 
-  #######################################
+
+
   ## education AHGA
   #table(dataset$V5)
   translations <- list(children = " Children",
@@ -138,22 +165,22 @@ get_task_census <- function(task.type="classif",
     dataset$V5 <- translate_levels(dataset$V5,translations)
   }
   ## reduction: 17 -> 4
-  #######################################
 
-  #######################################
+
+
   ## wage per hour AHRSPAY
   #summary(dataset$V6)
   #sum(dataset$V6>0)
   ## numeric
-  #######################################
 
-  #######################################
+
+
   ## enrolled in edu inst last wk AHSCOL
   #table(dataset$V7)
   ## no reduction
-  #######################################
 
-  #######################################
+
+
   ## marital status AMARITL
   #table(dataset$V8)
   translations <- list(married = c(" Married-A F spouse present"," Married-civilian spouse present"," Married-spouse absent"," Separated"),
@@ -163,9 +190,9 @@ get_task_census <- function(task.type="classif",
     dataset$V8 <- translate_levels(dataset$V8,translations)
   }
   ##reduction: 7 -> 2
-  #######################################
 
-  #######################################
+
+
   ## major industry code AMJIND
   #table(dataset$V9)
   ## merge into divisions, see https://en.wikipedia.org/wiki/Standard_Industrial_Classification#Range
@@ -199,21 +226,21 @@ get_task_census <- function(task.type="classif",
     dataset$V9 <- translate_levels(dataset$V9,translations)
   }
   ## reduction: 24 -> 11
-  #######################################
 
-  #######################################
+
+
   ## major occupation code AMJOCC
   #table(dataset$V10)
   ## no reduction: 15
-  #######################################
 
-  #######################################
+
+
   ## mace ARACE
   #levels(dataset$V11)
   ## no reduction: 5
-  #######################################
 
-  #######################################
+
+
   ## hispanic Origin AREORGN
   #table(dataset$V12)
   translations <- list(unknown = c(" Do not know", " NA"),
@@ -225,21 +252,21 @@ get_task_census <- function(task.type="classif",
     dataset$V12 <- translate_levels(dataset$V12,translations)
   }
   ## reduction: 10 -> 3
-  #######################################
 
-  #######################################
+
+
   ## sex ASEX
   #table(dataset$V13)
   ## no reductions: 2
-  #######################################
 
-  #######################################
+
+
   ## member of a labor union AUNMEM
   #table(dataset$V14)
   ## no reductions: 3
-  #######################################
 
-  #######################################
+
+
   ## reason for unemployment AUNTYPE
   #table(dataset$V15)
   translations <- list(unemployed = c(" Job leaver"," Job loser - on layoff"," New entrant"," Other job loser"," Re-entrant"),
@@ -249,9 +276,9 @@ get_task_census <- function(task.type="classif",
     dataset$V15 <- translate_levels(dataset$V15,translations)
   }
   ## reduction: 6 -> 2
-  #######################################
 
-  #######################################
+
+
   ## full or part time employment stat AWKSTAT
   #table(dataset$V16)
   translations <- list(childrenOrArmedForces = c(" Children or Armed Forces"),
@@ -265,27 +292,27 @@ get_task_census <- function(task.type="classif",
     dataset$V16 <- translate_levels(dataset$V16,translations)
   }
   ## reduction: 8 -> 4
-  #######################################
 
-  #######################################
+
+
   ## capital gains CAPGAIN
   #summary(dataset$V17)
   ## numeric
-  #######################################
 
-  #######################################
+
+
   ## capital losses CAPLOSS
   #summary(dataset$V18)
   ## numeric
-  #######################################
 
-  #######################################
+
+
   ## divdends from stocks DIVVAL
   #summary(dataset$V19)
   ## numeric
-  #######################################
 
-  #######################################
+
+
   ## federal income tax liability FEDTAX  ???
   ## tax filer status FILESTAT  ???
   #summary(dataset$V20)
@@ -298,15 +325,15 @@ get_task_census <- function(task.type="classif",
     dataset$V20 <- translate_levels(dataset$V20,translations)
   }
   ## no reduction: 6 -> 2
-  #######################################
 
-  #######################################
+
+
   ## region of previous residence GRINREG
   #summary(dataset$V21)
   ## not reduced: 6
-  #######################################
 
-  #######################################
+
+
   ## state of previous residence GRINST
   #summary(dataset$V22)
   if(cardinality!="high"){
@@ -314,9 +341,9 @@ get_task_census <- function(task.type="classif",
   }
   ## reduction: 51 -> 0
   ## i.e., remove entirely, since 21 is a reduced form of 22
-  #######################################
 
-  #######################################
+
+
   ## detailed household and family stat HHDFMX
   #summary(dataset$V23)
   if(cardinality!="high"){
@@ -324,9 +351,9 @@ get_task_census <- function(task.type="classif",
   }
   ## Possible reductions: 38 -> 0
   ## remove entirely, see V24
-  #######################################
 
-  #######################################
+
+
   ## detailed household summary in household HHDREL
   #summary(dataset$V24)
   translations <- list(child = c(" Child 18 or older"," Child under 18 ever married"," Child under 18 never married"),
@@ -339,15 +366,15 @@ get_task_census <- function(task.type="classif",
     dataset$V24 <- translate_levels(dataset$V24,translations)
   }
   ## reduction:  8 -> 4
-  #######################################
 
-  #######################################
+
+
   ## instance weight MARSUPWT
   ## remove instance weight. should not be used.
   dataset$V25 <- NULL
-  #######################################
 
-  #######################################
+
+
   ## migration code-change in msa MIGMTR1
   #summary(dataset$V26)
   translations <- list(unknown = c(" ?", " Not identifiable", " Not in universe"),
@@ -359,9 +386,9 @@ get_task_census <- function(task.type="classif",
     dataset$V26 <- translate_levels(dataset$V26,translations)
   }
   ## reduction:  10 -> 3
-  #######################################
 
-  #######################################
+
+
   ## migration code-change in reg MIGMTR3
   #summary(dataset$V27)
   if(cardinality=="low"){
@@ -369,9 +396,9 @@ get_task_census <- function(task.type="classif",
   }
   ## reduction:  9 -> 0
   ## the reduction would be redundant to V26
-  #######################################
 
-  #######################################
+
+
   ## migration code-move within reg MIGMTR4
   #summary(dataset$V28)
   if(cardinality=="low"){
@@ -379,15 +406,15 @@ get_task_census <- function(task.type="classif",
   }
   ## reduction:  10 -> 0
   ## the reduction would be redundant to V26
-  #######################################
 
-  #######################################
+
+
   ## live in this house 1 year ago MIGSAME
   #summary(dataset$V29)
   ## no reduction:  3
-  #######################################
 
-  #######################################
+
+
   ## migration prev res in sunbelt MIGSUN
   #summary(dataset$V30)
   translations <- list(unknown = c(" ?",  " Not in universe"),
@@ -398,21 +425,21 @@ get_task_census <- function(task.type="classif",
     dataset$V30 <- translate_levels(dataset$V30,translations)
   }
   ## reduction:  4 -> 3
-  #######################################
 
-  #######################################
+
+
   ## num persons worked for employer NOEMP
   #summary(dataset$V31)
   ## integer
-  #######################################
 
-  #######################################
+
+
   ## family members under 18 PARENT
   #summary(dataset$V32)
   ## no reduction: 5
-  #######################################
 
-  #######################################
+
+
   ## country of birth father PEFNTVTY
   #summary(dataset$V33)
   translationsMed <- list(unknown = c(" ?"),
@@ -445,9 +472,9 @@ get_task_census <- function(task.type="classif",
     dataset$V33 <- translate_levels(dataset$V33,translationsLow)
   }
   ## reduction:  43 -> 6, 43 ->3
-  #######################################
 
-  #######################################
+
+
   ## country of birth mother PEMNTVTY
   #summary(dataset$V34)
   if(cardinality=="med"){
@@ -457,9 +484,9 @@ get_task_census <- function(task.type="classif",
     dataset$V34 <- translate_levels(dataset$V34,translationsLow)
   }
   ## reduction:  43 -> 6, 43 ->3
-  #######################################
 
-  #######################################
+
+
   ## country of birth self PENATVTY
   #summary(dataset$V35)
   if(cardinality=="med"){
@@ -469,9 +496,9 @@ get_task_census <- function(task.type="classif",
     dataset$V35 <- translate_levels(dataset$V35,translationsLow)
   }
   ## reduction:  43 -> 6, 43 ->3
-  #######################################
 
-  #######################################
+
+
   ## citizenship PRCITSHP
   #summary(dataset$V36)
   translation <- list(uscitizen = c(" Foreign born- U S citizen by naturalization",
@@ -484,7 +511,7 @@ get_task_census <- function(task.type="classif",
     dataset$V36 <- translate_levels(dataset$V36,translation)
   }
   ## reduction:  5 -> 2
-  #######################################
+
 
   ## see here:
   #https://www.icpsr.umich.edu/web/ICPSR/studies/02825/variables?q=tax
@@ -493,43 +520,43 @@ get_task_census <- function(task.type="classif",
   #https://www.icpsr.umich.edu/web/ICPSR/studies/02825/datasets/0001/variables/VET-QVA?archive=icpsr
   #https://www.icpsr.umich.edu/web/ICPSR/studies/02825/datasets/0001/variables/PTOTVAL?archive=ICPSR
   #https://www.icpsr.umich.edu/web/ICPSR/studies/02825/datasets/0001/variables/TAX-INC?archive=icpsr
-  #######################################
+
   ## total person income PTOTVAL
   ## ?? own business or self employed SEOTR
   #summary(dataset$V37)
   ## integer, should be 3 level factor
   dataset$V37 <- as.factor(dataset$V37)
-  #######################################
 
-  #######################################
+
+
   ## ?? fill inc questionnaire for veteran's admin VETQVA
   #summary(dataset$V38)
   ## no reduction: 3
-  #######################################
 
-  #######################################
+
+
   ## ?? veterans benefits VETYN
   #summary(dataset$V39)
   ## integer, should be 3 level factor
   dataset$V39 <- as.factor(dataset$V39)
-  #######################################
 
-  #######################################
+
+
   ## weeks worked in year WKSWORK
   #summary(dataset$V40)
   ## integer
-  #######################################
 
-  #######################################
+
+
   ## moste likely: the year of the survey (1994, 1995)
   #summary(dataset$V41)
   ## integer
-  #######################################
 
-  #######################################
+
+
   ## target variable (income > or < 50k)
   #summary(dataset$V42)
-  #######################################
+
 
   cnames <- c(V1="age",
               V2="class_of_worker",
@@ -664,18 +691,19 @@ get_task_census <- function(task.type="classif",
   if(length(deletenames)>0)
     dataset[deletenames] <- NULL
 
-
-  task.nobservations <- nrow(dataset)
-  task.nfeatures <- ncol(dataset)
-  task.numericals <- lapply(dataset,class)!="factor"
-  task.numericals[target] <- FALSE
-  task.factors <- lapply(dataset,class)=="factor"
-  task.factors[target] <- FALSE
-  task.nnumericals <- sum(task.numericals)
-  task.nfactors <- sum(task.factors)
-  task.nlevels <- as.numeric(lapply(dataset,function(x)length(unique(x))))
-  task.nlevels[!task.factors] <- 0
-  task.nlevels.max <- max(task.nlevels)
+  # FIXME: Moved to getMlrTask(), can be deleted here:
+  # task.nobservations <- nrow(dataset)
+  # task.nfeatures <- ncol(dataset)
+  # task.numericals <- lapply(dataset,class)!="factor"
+  # task.numericals[target] <- FALSE
+  # task.factors <- lapply(dataset,class)=="factor"
+  # task.factors[target] <- FALSE
+  # task.nnumericals <- sum(task.numericals)
+  # task.nfactors <- sum(task.factors)
+  # task.nlevels <- as.numeric(lapply(dataset,function(x)length(unique(x))))
+  # task.nlevels[!task.factors] <- 0
+  # task.nlevels.max <- max(task.nlevels)
+  # FIXME END
 
   #print(task.nlevels)
   #task.factors[cat.features.high]
@@ -691,34 +719,50 @@ get_task_census <- function(task.type="classif",
         dataset[,i] <- droplevels(dataset[,i])
     }
   }
-  dim(dataset)
+  ## New in 1.16.2:
+  ## target is mapped to column "target"
+  dataset$target <- dataset[[target]]
+  dataset[[target]] <- NULL
 
-
-  task.nobservations <- nrow(dataset)
-  task.nfeatures <- ncol(dataset)
-  task.numericals <- lapply(dataset,class)!="factor"
-  task.numericals[target] <- FALSE
-  task.factors <- lapply(dataset,class)=="factor"
-  task.factors[target] <- FALSE
-  task.nnumericals <- sum(task.numericals)
-  task.nfactors <- sum(task.factors)
-  task.nlevels <- as.numeric(lapply(dataset,function(x)length(unique(x))))
-  task.nlevels[!task.factors] <- 0
-  task.nlevels.max <- max(task.nlevels)
-
-
-  print(task.nlevels)
-  if(task.type=="classif")
-    task <- makeClassifTask(data=dataset,target=target)
-  else if(task.type=="regr")
-    task <- makeRegrTask(data=dataset,target=target)
-
-  set.seed(data.seed)
-  train.id <- sample(1:getTaskSize(task),size = getTaskSize(task)*0.6,replace=FALSE)
-  test.id <- (1:getTaskSize(task))[-train.id]
-  rsmpl = makeFixedHoldoutInstance(train.id, test.id,getTaskSize(task))
-
-  #print(task)
-  return(list(task=task,resample=rsmpl))
+ return(dataset)
 }
+
+
+#' #' @title convert types for mlr based model
+#' #'
+#' #' @description  type conversions, e.g., \code{(as.factor(is.character))}
+#' #'
+#' #' @param x data from \code{\link{getCensusTrainValTestData}}
+#' #' @param target character. Target variable, e.g., \code{"income_class"}.
+#' #'
+#' #' @returns list, i.e.,  \code{list(trainDf, testDf, trueY)} where
+#' #' \code{trueY} is the true value on the testDf.
+#' #'
+#' #' @export
+#' convertCensusForMlr <- function(x,
+#'                                 target=NULL){
+#'   # convert types for mlr based model (as.factor(is.character))
+#'   trainDf <- x$trainCensus
+#'   trainDf[sapply(trainDf, is.character)] <- lapply(trainDf[sapply(trainDf, is.character)],
+#'                                                    as.factor)
+#'   #trainDf$income_class <- as.factor(trainDf$income_class)
+#'   trainDf[[target]] <- as.factor(trainDf[[target]])
+#'
+#'   testDf <- x$testCensus
+#'   testDf[sapply(testDf, is.character)] <- lapply(testDf[sapply(testDf, is.character)],
+#'                                                  as.factor)
+#'   # testDf$income_class <- as.factor(testDf$income_class)
+#'   trueY <- as.double(testDf[[target]]) -1
+#'   testDf[[target]] <- NULL
+#'
+#'   return(list(trainDf=trainDf, testDf=testDf, trueY=trueY))
+#'   }
+
+
+
+
+
+
+
+
 

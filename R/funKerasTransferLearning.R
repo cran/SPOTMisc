@@ -17,6 +17,7 @@
 #' \code{"optimizer" = x[7]} (type: factor).
 #' @param kerasConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
 #' Default: \code{kerasConf = getKerasConf()}.
+#' @param data data
 #' @seealso \code{\link{getKerasConf}}
 #' @seealso \code{\link{funKerasTransferLearning}}
 #' @seealso \code{\link{funKerasMnist}}
@@ -47,7 +48,6 @@
 #' @importFrom keras optimizer_adamax
 #' @importFrom keras model_to_json
 #' @importFrom keras application_xception
-#' @importFrom jsonlite fromJSON
 #' @importFrom tfdatasets dataset_batch
 #' @importFrom tfdatasets dataset_cache
 #' @importFrom tfdatasets dataset_prefetch
@@ -75,7 +75,8 @@
 #'
 #'
 evalKerasTransferLearning <- function(x,
-                                      kerasConf = getKerasConf()) {
+                                      kerasConf = getKerasConf(),
+                                      data = NULL) {
   FLAGS <- list(
     "dropout" =  x[1],
     "learning_rate" =  x[2],
@@ -115,6 +116,7 @@ evalKerasTransferLearning <- function(x,
     testData       %<>% dataset_cache_batch_prefetch()
 
     ##
+    with(tf$device("/cpu:0"), {
     data_augmentation <- keras_model_sequential() %>%
       layer_random_flip("horizontal") %>%
       layer_random_rotation(.1)
@@ -223,6 +225,7 @@ evalKerasTransferLearning <- function(x,
     score <- model %>% evaluate(x = testData,
                                 y = NULL,
                                 verbose = kerasConf$verbose)
+    }) ## end with
     ## matrix with six entries:
 
     # trainingLoss,  negTrainingAccuracy,
@@ -264,6 +267,7 @@ evalKerasTransferLearning <- function(x,
 #' Rows for points and columns for dimension.
 #' @param kConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
 #' Default: \code{kConf = getKerasConf()}.
+#' @param data data
 #'
 #' @seealso \code{\link{getKerasConf}}
 #' @seealso \code{\link{evalKerasTransferLearning}}
@@ -271,7 +275,6 @@ evalKerasTransferLearning <- function(x,
 #' @seealso \code{\link[keras]{fit}}
 #'
 #' @return 1-column matrix with resulting function values (test loss).
-#' Note: \code{NA} values can be mapped to \code{kConf$naDummy}.
 #'
 #' @importFrom SPOT wrapFunction
 #' @importFrom keras dataset_mnist
@@ -459,7 +462,9 @@ evalKerasTransferLearning <- function(x,
 #'
 #' @export
 funKerasTransferLearning <- function (x,
-                                      kConf = getKerasConf()) {
+                                      kConf = getKerasConf(),
+                                      data = NULL) {
+  score <- NULL
   y <- matrix(apply(
     X = x,
     # matrix
@@ -467,12 +472,10 @@ funKerasTransferLearning <- function (x,
     # margin (apply over rows)
     evalKerasTransferLearning,
     # function
-    kerasConf = kConf
+    kerasConf = kConf,
+    data = data
   ),
   nrow = nrow(x),
   byrow = TRUE)
-  if(is.numeric(kConf$naDummy)){
-  y[is.na(y) | is.infinite(y)] <- kConf$naDummy
-  }
   return(y)
 }

@@ -25,6 +25,11 @@
 #'   this value.
 #' @param ... Unused, present only for backwards compatability
 #'
+#' @note To enable compatibility with the ranges of the learning rates
+#' of the other optimizers, the learning rate \code{learning_rate}
+#' is internally mapped to \code{10 * learning_rate}. That is,
+#' a learning rat of 0.001 will be mapped to 0.01 (which is the default.)
+#'
 #' @return Optimizer for use with \code{\link{compile.keras.engine.training.Model}}.
 #'
 #' @family optimizers
@@ -32,6 +37,7 @@
 #' @export
 optimizer_sgd <- function(learning_rate = 0.01, momentum = 0.0, decay = 0.0, nesterov = FALSE,
                           clipnorm = NULL, clipvalue = NULL, ...) {
+  learning_rate = 10*learning_rate
 
  #  backcompat_fix_rename_lr_to_learning_rate(...)
 
@@ -92,14 +98,16 @@ optimizer_rmsprop <- function(learning_rate = 0.001, rho = 0.9, epsilon = NULL, 
 #' @importFrom keras keras
 #' @inheritParams optimizer_rmsprop
 #'
-#' @note It is recommended to leave the parameters of this optimizer at their
-#'   default values.
-#'
+#' @note To enable compatibility with the ranges of the learning rates
+#' of the other optimizers, the learning rate \code{learning_rate}
+#' is internally mapped to \code{10 * learning_rate}. That is,
+#' a learning rat of 0.001 will be mapped to 0.01 (which is the default.)
 #' @family optimizers
 #'
 #' @export
 optimizer_adagrad <- function(learning_rate = 0.01, epsilon = NULL, decay = 0.0,
                               clipnorm = NULL, clipvalue = NULL, ...) {
+  learning_rate = 10*learning_rate
 
  #  backcompat_fix_rename_lr_to_learning_rate(...)
 
@@ -124,14 +132,21 @@ optimizer_adagrad <- function(learning_rate = 0.01, epsilon = NULL, decay = 0.0,
 #'
 #' @inheritParams optimizer_rmsprop
 #'
-#' @note It is recommended to leave the parameters of this optimizer at their
+#' @note To enbale compatibility with the ranges of the learning rates
+#' of the other optimizers, the learning rate \code{learning_rate}
+#' is internally mapped to \code{1- learning_rate}. That is,
+#' a learning rat of 0 will be mapped to 1 (which is the default.)
+#' It is recommended to leave the parameters of this optimizer at their
 #'   default values.
 #'
 #' @family optimizers
 #'
 #' @export
-optimizer_adadelta <- function(learning_rate = 1.0, rho = 0.95, epsilon = NULL, decay = 0.0,
+optimizer_adadelta <- function(learning_rate = 0, rho = 0.95, epsilon = NULL, decay = 0.0,
                                clipnorm = NULL, clipvalue = NULL, ...) {
+
+  # Mapping to get similar intervals
+  learning_rate <- 1 - learning_rate
 
  #  backcompat_fix_rename_lr_to_learning_rate(...)
 
@@ -210,12 +225,17 @@ optimizer_adam <- function(learning_rate = 0.001, beta_1 = 0.9, beta_2 = 0.999, 
 #' @importFrom keras keras
 #'
 #' @inheritParams optimizer_adam
+#' @note To enable compatibility with the ranges of the learning rates
+#' of the other optimizers, the learning rate \code{learning_rate}
+#' is internally mapped to \code{2 * learning_rate}. That is,
+#' a learning rat of 0.001 will be mapped to 0.002 (which is the default.)
 #'
 #' @family optimizers
 #'
 #' @export
 optimizer_adamax <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999, epsilon = NULL, decay = 0.0,
                              clipnorm = NULL, clipvalue = NULL, ...) {
+  learning_rate = 2*learning_rate
 
  #  backcompat_fix_rename_lr_to_learning_rate(...)
 
@@ -249,6 +269,11 @@ optimizer_adamax <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999
 #'   recommended to leave the parameters of this optimizer at their default
 #'   values.
 #'
+#' @note To enable compatibility with the ranges of the learning rates
+#' of the other optimizers, the learning rate \code{learning_rate}
+#' is internally mapped to \code{2 * learning_rate}. That is,
+#' a learning rat of 0.001 will be mapped to 0.002 (which is the default.)
+#'
 #' @seealso [On the importance of initialization and momentum in deep
 #'   learning](https://www.cs.toronto.edu/~fritz/absps/momentum.pdf).
 #'
@@ -257,6 +282,7 @@ optimizer_adamax <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999
 #' @export
 optimizer_nadam <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999, epsilon = NULL,
                             schedule_decay = 0.004, clipnorm = NULL, clipvalue = NULL, ...) {
+  learning_rate = 2*learning_rate
 
  #  backcompat_fix_rename_lr_to_learning_rate(...)
 
@@ -291,3 +317,130 @@ optimizer_nadam <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999,
 #   }
 #   ellipsis::check_dots_empty()
 # }
+
+#' @title Select keras optimizer
+#'
+#' @param name integer specifying the algorithm. Can be one of the following:
+#' \code{1=SDG}, \code{2=RMSPROP}, \code{3=ADAGRAD}, \code{4=ADADELTA},
+#' \code{5=ADAM}, \code{6=ADAMAX}, or \code{7=NADAM}.
+#'
+#' ## SGD:
+#' @param learning_rate float >= 0. Learning rate.
+#' @param momentum float >= 0. Parameter that accelerates SGD in the relevant
+#'   direction and dampens oscillations.
+#' @param decay float >= 0. Learning rate decay over each update.
+#' @param nesterov boolean. Whether to apply Nesterov momentum.
+#' @param clipnorm Gradients will be clipped when their L2 norm exceeds this
+#'   value.
+#' @param clipvalue Gradients will be clipped when their absolute value exceeds
+#'   this value.
+#'
+#' ### RMS:
+#' @param rho float >= 0. Decay factor.
+#' @param epsilon float >= 0. Fuzz factor. If `NULL`, defaults to `k_epsilon()`.
+#'
+#' ### ADAM:
+#' @param beta_1 The exponential decay rate for the 1st moment estimates. float,
+#'   0 < beta < 1. Generally close to 1.
+#' @param beta_2 The exponential decay rate for the 2nd moment estimates. float,
+#'   0 < beta < 1. Generally close to 1.
+#' @param amsgrad Whether to apply the AMSGrad variant of this algorithm from
+#'   the paper "On the Convergence of Adam and Beyond".
+#' @param ... Unused, present only for backwards compatability
+#'
+#' @return Optimizer for use with \code{\link{compile.keras.engine.training.Model}}.
+#'
+#' @export
+#'
+selectKerasOptimizer <- function(name,
+                                 learning_rate = 0.01,
+                                 momentum = 0.0,
+                                 decay = 0.0,
+                                 nesterov = FALSE,
+                                 clipnorm = NULL,
+                                 clipvalue = NULL,
+                                 rho = 0.9,
+                                 epsilon = NULL,
+                                 beta_1 = 0.9,
+                                 beta_2 = 0.999,
+                                 amsgrad = FALSE,
+                                 ...){
+  names <- list("SDG", "RMSPROP", "ADAGRAD", "ADADELTA",
+    "ADAM", "ADAMAX", "NADAM")
+  # FIXME: remove after testing:
+  message("selectKerasOptimizer using optimizer:")
+  print(names[[name]])
+
+  switch(names[[name]],
+         SDG = {optimizer_sgd(learning_rate = learning_rate,
+                            momentum = 0.0,
+                            decay = 0.0,
+                            nesterov = FALSE,
+                            clipnorm = NULL,
+                            clipvalue = NULL,
+                            ...)},
+         RMSPROP = {optimizer_rmsprop(learning_rate = learning_rate,
+                                      rho = 0.9,
+                                      epsilon = epsilon,
+                                      decay = 0.0,
+                                      clipnorm = NULL,
+                                      clipvalue = NULL, ...)},
+         ADAGRAD = {optimizer_adagrad(learning_rate = learning_rate,
+                                      epsilon = epsilon,
+                                      decay = 0.0,
+                                      clipnorm = NULL,
+                                      clipvalue = NULL, ...)},
+         ADADELTA = {optimizer_adadelta(learning_rate = learning_rate,
+                                        rho = 0.95,
+                                        epsilon = epsilon,
+                                        decay = 0.0,
+                                        clipnorm = NULL,
+                                        clipvalue = NULL,
+                                        ...)},
+         ADAM = {
+           optimizer_adam(
+             # learning rate (default 1e-3)
+             learning_rate = learning_rate,
+             # The exponential decay rate for the 1st moment estimates. float, 0 < beta < 1.
+             # Generally close to 1. Default: 0.9
+             beta_1 = beta_1,
+             # The exponential decay rate for the 2nd moment estimates.
+             # float, 0 < beta < 1. Generally close to 1. Default: 0.99
+             beta_2 = beta_2,
+             # Fuzz factor. If NULL, defaults to k_epsilon().
+             # (default k_epsilon = 1e-7)
+             epsilon = epsilon,
+             # Learning rate decay over each update. (default 0)
+             decay = 0,
+             # Whether to apply the AMSGrad variant of this algorithm
+             # from the paper "On the Convergence of Adam and Beyond"
+             amsgrad = FALSE,
+             # Gradients will be clipped when their L2 norm exceeds this value.
+             clipnorm = NULL,
+             # Gradients will be clipped when their absolute value exceeds this value.
+             clipvalue = NULL,
+             ...
+           )
+           },
+         ADAMAX = {optimizer_adamax(learning_rate = learning_rate,
+                                    beta_1 = beta_1,
+                                    beta_2 = beta_2,
+                                    epsilon = epsilon,
+                                    decay = 0.0,
+                                    clipnorm = NULL,
+                                    clipvalue = NULL,
+                                    ...)},
+        NADAM = {optimizer_nadam(learning_rate = learning_rate,
+                                 beta_1 = beta_1,
+                                 beta_2 = beta_2,
+                                 epsilon = epsilon,
+                                 schedule_decay = 0.004,
+                                 clipnorm = NULL,
+                                 clipvalue = NULL, ...)},
+         stop("selectKerasOptimizer: Wrong optimizer.")
+  )
+}
+
+
+
+

@@ -64,24 +64,24 @@ test_that("check logging keras", {
   library("SPOT")
   set.seed(1)
   kerasConf <- getKerasConf()
-  kerasConf$verbose <- 1
+  kerasConf$verbose <- 0
   kerasConf$resDummy <- TRUE
-  lower <- c(1e-6, 1e-6, 1, 0.6, 0.99, 1e-9, 1)
+  lower <- c(1e-6, 1e-6, 2, 0.6, 1e-9, 2, 6,0.4,0.99,1,1e-8)
+  upper <- c(0.5, 0.5, 3, 1.5, 1e-2, 3, 10,0.999,0.999,2,6e-8)
   res <- spot(x=NULL,
               funKerasMnist,
-              lower <- c(1e-6, 1e-6, 1, 0.6, 0.99, 1e-9, 1),
-              upper <- c(1e-3, 1e-3, 2, 0.7, 0.999, 1e-6, 2),
+              lower = lower,
+              upper = upper,
               control=list(funEvals=15,
                            noise = TRUE,
                            # optimizer=optimDE,
                            optimizer = optimLHD,
                            plots = FALSE,
                            progress = TRUE,
-                           seedFun = 1, # mandatory for multi-dim responses
                            noise = TRUE,
                            seedSPOT = 1,
                            model = buildRandomForest,
-                           verbosity = 1
+                           verbosity = 0
               ),
               kConf=kerasConf
   )

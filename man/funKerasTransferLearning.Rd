@@ -4,7 +4,7 @@
 \alias{funKerasTransferLearning}
 \title{funKerasTransferLearning}
 \usage{
-funKerasTransferLearning(x, kConf = getKerasConf())
+funKerasTransferLearning(x, kConf = getKerasConf(), data = NULL)
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
@@ -12,10 +12,11 @@ Rows for points and columns for dimension.}
 
 \item{kConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
 Default: \code{kConf = getKerasConf()}.}
+
+\item{data}{data}
 }
 \value{
 1-column matrix with resulting function values (test loss).
-Note: \code{NA} values can be mapped to \code{kConf$naDummy}.
 }
 \description{
 Hyperparameter Tuning: Keras TransfewrLearning Test Function.

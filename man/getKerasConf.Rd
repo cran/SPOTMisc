@@ -16,13 +16,17 @@ Configuration list for \code{keras}'s \code{\link[keras]{fit}} function.
 Additional parameters passed to \code{keras}, e.g.,
 \describe{
 	\item{\code{verbose:}}{Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch). Default: \code{0}.}
+	\item{\code{nClasses:}}{Number of classes in (multi-class) classification. Specifies the number of units in the last layer (before softmax).
+	Default: \code{1} (binary classification).}
+	\item{\code{activation:}}{character. Activation function in the last layer. Default: \code{"sigmoid"}.}
+	\item{\code{loss:}}{character. Loss function for compile. Default: \code{"loss_binary_crossentropy"}.}
+	\item{\code{metrics:}}{character. Metrics function for compile. Default: \code{"binary_accuracy"}.}
 	\item{\code{clearSession:}}{logical. Whether to call \code{\link[keras]{k_clear_session}} or not at the end of keras modelling. Default: \code{FALSE}.}
 	\item{\code{resDummy:}}{logical. If \code{TRUE}, generate dummy (mock up) result for testing. If \code{FALSE}, run keras and tf evaluations.
 	Default: \code{FALSE}.}
-	\item{\code{naDummy:}}{numeric. Replacement for \code{NA} function values (loss/accuracy), e.g., \code{1234567890} if keras run is not
-	successfully completed. This large dummy value can be used by optimizers that cannot handle \code{NAs}.}
 	\item{\code{returnValue:}}{Return value. Can be one of \code{"trainingLoss"}, \code{"negTrainingAccuracy"},
 	\code{"validationLoss"}, \code{"negValidationAccuracy"}, \code{"testLoss"}, or \code{"negTestAccuracy"}.
+	Or \code{"model"}, i.e., the trained model is returned.
 	Default: \code{"validationLoss"}.}
 	\item{\code{callbacks:}}{List of callbacks to be called during training. Default: \code{list()}.}
 	\item{\code{validation_split:}}{Float between 0 and 1. Fraction of the training data to be

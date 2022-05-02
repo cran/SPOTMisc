@@ -1214,12 +1214,12 @@ optimizer</h3>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>( </span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;benchmarkme&quot;</span>, <span class="st">&quot;callr&quot;</span>, <span class="st">&quot;emoa&quot;</span>, <span class="st">&quot;ggsci&quot;</span>, <span class="st">&quot;jsonlite&quot;</span>, <span class="st">&quot;keras&quot;</span>, <span class="st">&quot;magrittr&quot;</span>, <span class="st">&quot;mlr&quot;</span>, <span class="st">&quot;plotly&quot;</span>, <span class="st">&quot;RColorBrewer&quot;</span>, <span class="st">&quot;reticulate&quot;</span>, <span class="st">&quot;rpart.plot&quot;</span>, <span class="st">&quot;sensitivity&quot;</span>, <span class="st">&quot;smoof&quot;</span>, <span class="st">&quot;tensorflow&quot;</span>, <span class="st">&quot;tfdatasets&quot;</span>))</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;~/workspace/spotmisc/packages/SPOT_2.7.6.tar.gz&quot;</span>,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;~/workspace/spotmisc/packages/SPOT_2.8.4.tar.gz&quot;</span>,</span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">repos =</span> <span class="cn">NULL</span>,</span>
 <span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;source&quot;</span></span>
 <span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;~/workspace/spotmisc/packages/SPOTMisc_1.6.6.tar.gz&quot;</span>,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;~/workspace/spotmisc/packages/SPOTMisc_1.8.0.tar.gz&quot;</span>,</span>
 <span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">repos =</span> <span class="cn">NULL</span>,</span>
 <span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;source&quot;</span></span>
 <span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1286,6 +1286,87 @@ optimizer</h3>
 <span id="cb31-73"><a href="#cb31-73" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist11&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()), <span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
 </div>
 </div>
+</div>
+<div id="census-data" class="section level1">
+<h1>Census Data</h1>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;~/workspace/book/packages/SPOTMisc_1.8.2.tar.gz&quot;, repos = NULL, type = &quot;source&quot;)</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;~/workspace/book/packages/SPOT_2.8.4.tar.gz&quot;, repos = NULL, type = &quot;source&quot;)</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SPOTMisc&quot;</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">packageVersion</span>(<span class="st">&quot;SPOTMisc&quot;</span>) <span class="sc">&lt;</span> <span class="st">&quot;1.8.0&quot;</span>) <span class="fu">stop</span>(<span class="st">&quot;Please update &#39;SPOT&#39;&quot;</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SPOT&quot;</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">packageVersion</span>(<span class="st">&quot;SPOT&quot;</span>) <span class="sc">&lt;</span> <span class="st">&quot;2.8.4&quot;</span>) <span class="fu">stop</span>(<span class="st">&quot;Please update &#39;SPOT&#39;&quot;</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;dropout&quot; =  x[1]: 0.1--0.5</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;dropoutfact&quot; =  x[2]: 1-1</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;units&quot; = x[3]: 1-1</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;unitsfact&quot; = x[4]: 1-1</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;learning_rate&quot; =  x[5]: 1e-5--1e-2</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;epochs&quot; = x[6]: 3-6</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;beta_1&quot; =  x[7]: 0.9--0.999</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;beta_2&quot; =  x[8]: 0.99--0.9999</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;layers&quot; =  x[9]: 1-1</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a> <span class="co">#  &quot;epsilon&quot; = x[10]: 1e-8--1e-6</span></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>lower <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="fl">1e-5</span>, <span class="dv">3</span>, <span class="fl">0.9</span>,  <span class="fl">0.99</span>,    <span class="dv">1</span>, <span class="fl">1e-8</span>)</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>upper <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="fl">1e-2</span>, <span class="dv">6</span>, <span class="fl">0.999</span>, <span class="fl">0.9999</span>, <span class="dv">1</span>, <span class="fl">1e-6</span>)</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>types <span class="ot">&lt;-</span>  <span class="fu">rep</span>(<span class="st">&quot;numeric&quot;</span>, <span class="fu">length</span>(lower))</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>types[<span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="st">&quot;integer&quot;</span></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span> <span class="sc">^</span> x</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>transformFun <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="st">&quot;identity&quot;</span>, <span class="fu">length</span>(lower))</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>transformFun[<span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">9</span>)] <span class="ot">&lt;-</span> <span class="st">&quot;f2&quot;</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>kerasConf <span class="ot">&lt;-</span> <span class="fu">getKerasConf</span>()</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>kerasConf<span class="sc">$</span>verbose <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a>kerasConf<span class="sc">$</span>resDummy <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a>Ninit <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">length</span>(lower)</span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>Rinit <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>replicates <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb32-34"><a href="#cb32-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-35"><a href="#cb32-35" aria-hidden="true" tabindex="-1"></a>task.type <span class="ot">&lt;-</span> <span class="st">&quot;classif&quot;</span></span>
+<span id="cb32-36"><a href="#cb32-36" aria-hidden="true" tabindex="-1"></a>nobs <span class="ot">&lt;-</span> <span class="fl">1e4</span> <span class="co"># max: 229285</span></span>
+<span id="cb32-37"><a href="#cb32-37" aria-hidden="true" tabindex="-1"></a>nfactors <span class="ot">=</span> <span class="st">&quot;high&quot;</span></span>
+<span id="cb32-38"><a href="#cb32-38" aria-hidden="true" tabindex="-1"></a>nnumericals <span class="ot">&lt;-</span> <span class="st">&quot;high&quot;</span></span>
+<span id="cb32-39"><a href="#cb32-39" aria-hidden="true" tabindex="-1"></a>cardinality <span class="ot">=</span> <span class="st">&quot;high&quot;</span></span>
+<span id="cb32-40"><a href="#cb32-40" aria-hidden="true" tabindex="-1"></a>data.seed <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb32-41"><a href="#cb32-41" aria-hidden="true" tabindex="-1"></a>tuner.seed <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb32-42"><a href="#cb32-42" aria-hidden="true" tabindex="-1"></a>timebudget <span class="ot">&lt;-</span>  <span class="dv">3600</span></span>
+<span id="cb32-43"><a href="#cb32-43" aria-hidden="true" tabindex="-1"></a>timeout <span class="ot">&lt;-</span> timebudget<span class="sc">/</span><span class="dv">20</span></span>
+<span id="cb32-44"><a href="#cb32-44" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">getCensusTrainValTestData</span>(<span class="at">task.type=</span>task.type,</span>
+<span id="cb32-45"><a href="#cb32-45" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">nobs=</span>nobs,</span>
+<span id="cb32-46"><a href="#cb32-46" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">nfactors =</span> nfactors,</span>
+<span id="cb32-47"><a href="#cb32-47" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">nnumericals =</span> nnumericals,</span>
+<span id="cb32-48"><a href="#cb32-48" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">cardinality =</span> cardinality,</span>
+<span id="cb32-49"><a href="#cb32-49" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">data.seed =</span><span class="dv">1</span>)</span>
+<span id="cb32-50"><a href="#cb32-50" aria-hidden="true" tabindex="-1"></a>specCensusPrep <span class="ot">&lt;-</span> <span class="fu">censusDataPrep</span>(<span class="at">data=</span>data, <span class="at">batch_size =</span> <span class="dv">32</span>)</span>
+<span id="cb32-51"><a href="#cb32-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-52"><a href="#cb32-52" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">spot</span>(</span>
+<span id="cb32-53"><a href="#cb32-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb32-54"><a href="#cb32-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">fun =</span> funKerasCensus,</span>
+<span id="cb32-55"><a href="#cb32-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">lower =</span> lower,</span>
+<span id="cb32-56"><a href="#cb32-56" aria-hidden="true" tabindex="-1"></a>  <span class="at">upper =</span> upper,</span>
+<span id="cb32-57"><a href="#cb32-57" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">list</span>(</span>
+<span id="cb32-58"><a href="#cb32-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">funEvals =</span> <span class="dv">20</span> <span class="sc">*</span> <span class="fu">length</span>(lower),</span>
+<span id="cb32-59"><a href="#cb32-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">multiStart =</span> <span class="dv">2</span>,</span>
+<span id="cb32-60"><a href="#cb32-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">noise =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb32-61"><a href="#cb32-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">types =</span> types,</span>
+<span id="cb32-62"><a href="#cb32-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">transformFun =</span> transformFun,</span>
+<span id="cb32-63"><a href="#cb32-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">replicates =</span> replicates,</span>
+<span id="cb32-64"><a href="#cb32-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">designControl =</span> <span class="fu">list</span>(<span class="at">replicates =</span> Rinit,</span>
+<span id="cb32-65"><a href="#cb32-65" aria-hidden="true" tabindex="-1"></a>                         <span class="at">size =</span> Ninit),</span>
+<span id="cb32-66"><a href="#cb32-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> buildKriging,</span>
+<span id="cb32-67"><a href="#cb32-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">optimizer =</span> optimDE,</span>
+<span id="cb32-68"><a href="#cb32-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">modelControl =</span> <span class="fu">list</span>(<span class="at">target =</span> <span class="st">&quot;y&quot;</span>),</span>
+<span id="cb32-69"><a href="#cb32-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">plots =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb32-70"><a href="#cb32-70" aria-hidden="true" tabindex="-1"></a>    <span class="at">progress =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb32-71"><a href="#cb32-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
+<span id="cb32-72"><a href="#cb32-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span>,</span>
+<span id="cb32-73"><a href="#cb32-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbosity=</span><span class="dv">0</span></span>
+<span id="cb32-74"><a href="#cb32-74" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb32-75"><a href="#cb32-75" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
+<span id="cb32-76"><a href="#cb32-76" aria-hidden="true" tabindex="-1"></a>  <span class="at">specCensusPrep =</span>specCensusPrep</span>
+<span id="cb32-77"><a href="#cb32-77" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-78"><a href="#cb32-78" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;rescs3Census01&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()), <span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
 </div>
 
 

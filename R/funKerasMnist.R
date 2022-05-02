@@ -58,6 +58,8 @@ evalKerasMnist <-
   function(x,
            kerasConf = getKerasConf(),
            data = getMnistData()) {
+
+    score <- NULL
     FLAGS <- list(
       "dropout" =  x[1],
       "dropoutfact" =  x[2],
@@ -104,6 +106,7 @@ evalKerasMnist <-
       y_test <- data$y_test
 
       # Define Model
+      with(tf$device("/cpu:0"), {
       model <- keras_model_sequential()
       units <- FLAGS$units
       dropout <- FLAGS$dropout
@@ -141,6 +144,7 @@ evalKerasMnist <-
       #            global_step, 10000,
       #          0.95, staircase=True)
 
+
       model %>% compile(
         loss = 'categorical_crossentropy',
         optimizer = optimizer_adam(
@@ -177,8 +181,7 @@ evalKerasMnist <-
         validation_split = kerasConf$validation_split,
         shuffle = kerasConf$shuffle
       )
-
-      if (kerasConf$verbose > 0) {
+    if (kerasConf$verbose > 0) {
         cat('val loss:', history$metrics$val_loss , '\n')
         cat('val accuracy:',  history$metrics$val_acc, '\n')
         plot(history)
@@ -187,7 +190,7 @@ evalKerasMnist <-
       # evaluate on test data
       score <- model %>% evaluate(x_test, y_test,
                                   verbose = kerasConf$verbose)
-
+      }) ## end with
       ## y: matrix with six entries:
       # trainingLoss,  negTrainingAccuracy,
       # validationLoss,  negValidationAccuracy,
@@ -303,12 +306,10 @@ funKerasMnist <-
       # margin (apply over rows)
       evalKerasMnist,
       # function
-      kerasConf = kConf
+      kerasConf = kConf,
+      data = data
     ),
     nrow = nrow(x),
     byrow = TRUE)
-    if (is.numeric(kConf$naDummy)) {
-      y[is.na(y) | is.infinite(y)] <- kConf$naDummy
-    }
     return(y)
   }

@@ -4,7 +4,7 @@
 \alias{evalKerasTransferLearning}
 \title{evalKerasTransferLearning}
 \usage{
-evalKerasTransferLearning(x, kerasConf = getKerasConf())
+evalKerasTransferLearning(x, kerasConf = getKerasConf(), data = NULL)
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
@@ -19,6 +19,8 @@ Rows for points and columns for dimension.
 
 \item{kerasConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
 Default: \code{kerasConf = getKerasConf()}.}
+
+\item{data}{data}
 }
 \value{
 list with function values (training, validation, and test loss/accuracy,

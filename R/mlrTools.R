@@ -1,136 +1,4 @@
-#' @title
-#' Helper function: translate levels
-#'
-#' @description
-#' Translate existing levels of a factor into new levels.
-#'
-#' @param x a factor vector to be translated
-#' @param translations a named list that specifies the translation: \code{list(newlevel=c(oldlevel1,oldlevel2,etc))}.
-#' @return translated factor
-#'
-#' @export
-translate_levels <- function(x, translations) {
-	x <- as.character(x)
-	for (i in 1:length(translations)) {
-		sel <- x %in% translations[[i]]
-		x[sel] <- names(translations[i])
-	}
-	as.factor(x)
-}
-
-#' @title
-#' Helper function: transform integer to factor
-#'
-#' @description
-#' This function re-codes a factor with pre-specified factor levels,
-#' using an integer encoding as input.
-#'
-#' @param x an integer vector (that represents factor vector) to be transformed
-#' @param lvls the original factor levels used
-#'
-#' @return the same factor, now coded with the original levels
-#'
-#' @export
-int2fact <- function(x, lvls) {
-	nms <- names(lvls)
-	for (i in 1:length(lvls)) {
-		x[[nms[i]]] <-  lvls[[i]][x[[nms[i]]]]
-	}
-	x
-}
-
-#' @title
-#' Identity transformation
-#'
-#' @description
-#' Parameter values can be translated,
-#' e.g., to base 10 as implemented in \code{\link{trans_10pow}}.
-#' \code{trans_id} implements the identity (transformation), i.e., x is mapped to x.
-#'
-#' @param x input
-#'
-#' @return \code{x}
-#'
-#' @export
-trans_id <- function(x) {
-	x
-}
-
-#' @title 2 power x transformation
-#' @description
-#' Parameter values can be translated,
-#' e.g., to base 10 as implemented in \code{\link{trans_10pow}}.
-#' \code{trans_2pow} implements the transformation x -> 2^x.
-#'
-#' @param x input
-#' @return \code{2^x}
-#'
-#' @export
-trans_2pow <- function(x) {
-	2 ^ x
-}
-
-#' @title 2 power x transformation with round
-#' @description
-#' Parameter values can be translated,
-#' e.g., to base 10 as implemented in \code{\link{trans_10pow}}.
-#' \code{trans_2pow_round} implements the transformation x -> round(2^x).
-#'
-#' @param x input
-#' @return \code{round(2^x)}
-#'
-#' @export
-trans_2pow_round <- function(x) {
-	round(2 ^ x)
-}
-
-#' @title 10 power x transformation
-#' @description
-#' Parameter values can be translated,
-#' e.g., to base 10.
-#'
-#' @param x input
-#' @return \code{10^x}
-#'
-#' @export
-trans_10pow <- function(x) {
-	10 ^ x
-}
-
-
-#' @title 10 power x transformation
-#' @description
-#' Parameter values x are transformed to \code{1-10^x}.
-#' This is helpful for parameters that are likely to be set very close to (but below) a value of 1,
-#' such as discount factors in reinforcement learning.
-#'
-#' @param x input
-#' @return \code{1-10^x}
-#'
-#' @export
-trans_1minus10pow <- function(x) {
-  1 - (10 ^ x)
-}
-
-
-#' @title 10 power x transformation with round
-#'
-#' @description
-#' Parameter values can be translated,
-#' e.g., to base 10 as implemented in \code{\link{trans_10pow}}.
-#' \code{trans_10pow_round} implements the transformation x -> round(2^x).
-#'
-#' @param x input
-#' @return \code{round(10^x)}
-#'
-#' @export
-trans_10pow_round <- function(x) {
-	round(10 ^ x)
-}
-
-
-#' @title
-#' Check the validity of input parameters.
+#' @title  Check the validity of input parameters.
 #'
 #' @description
 #' Helper function. Check correct parameter names.
@@ -156,65 +24,25 @@ valid_inputs <- function(chars) {
   chars[is_valid]
 }
 
-
-#' @title Make benchmark
-#'
-#' @description Run standard benchmark from the package \code{benchmarkme} and return the
-#' required time in seconds
-#' #'
-#' @importFrom benchmarkme benchmark_std
-#'
-#' @return total time (in seconds)
-#'
-#' @export
-#' @keywords internal
-makeBench <- function() {
-	res <- benchmark_std(runs = 1, verbose = FALSE)
-	total_time <- sum(res$user) ## in seconds
-	return(total_time)
-}
-
-
-#' @title Get budget (time, function evaluations)
-#' @description
-#' Determine time factor and corrected  budget and timeout.
-#' Runs a benchmark to determine processing speed of assigned computing resources.
-#'
-#' @param runtime_bench runtime
-#' @param settings settings
-#'
-#' @return settings
-#' @export
-#' @keywords internal
-getBudget <- function(runtime_bench,
-											settings) {
-	if (is.null(runtime_bench)) {
-		runtime_bench <- mean(replicate(3, makeBench())) ## in seconds
-		runtime_default <- 5.6 ## in seconds
-		time_multiplier <- runtime_bench / runtime_default
-	}
-	settings$actual_timebudget <-	time_multiplier * settings$timebudget
-	settings$actual_timeout <- time_multiplier * settings$timeout
-	settings$runtime_bench <- runtime_bench
-	settings$time_multiplier <- time_multiplier
-	return(settings)
-}
-
-
 #' @title Get objective function for mlr
 #'
 #' @description mlrTools
 #' This function receives a configuration for a tuning experiment,
 #' and returns an objective function to be tuned via SPOT.
+#' It basically provides the result from a call to \code{\link[mlr]{resample}}:
+#' \code{resample(lrn, task, resample, measures = measures, show.info = FALSE)},
+#' with measures defined as \code{mmce} for classification and \code{rmse} for regression, \code{timeboth}, \code{timetrain}, and
+#' \code{timepredict}.
+#'
+#' @details Parameter names are set, parameters are transformed
+#' to the actual parameter scale, integer levels are converted
+#' to factor levels for categorical parameters, and parameters
+#' are set in relation to other parameters.
 #'
 #' @param config list
 #' @param timeout integer, time in seconds after which a model (learner) evaluation will be aborted.
 #'
 #' @return an objective function that can be optimized via \code{\link[SPOT]{spot}}.
-#' It basically provides the result from a call to \code{\link[mlr]{resample}}:
-#' \code{resample(lrn, task, resample, measures = measures, show.info = FALSE)},
-#' with measures defined as \code{rmse}, \code{timeboth}, \code{timetrain}, and
-#' \code{timepredict}.
 #'
 #' @export
 #' @importFrom callr r
@@ -226,846 +54,666 @@ getBudget <- function(runtime_bench,
 #' @importFrom mlr makeLearner
 #' @importFrom mlr resample
 #'
-get_objf <- function(config,timeout=3600){
+getObjf <- function(config, timeout = 3600) {
   force(config)
   force(timeout)
 
-  objfun <- function(x,seed){
+  objfun <- function(x, seed) {
     params <- as.list(x)
     ## set parameter names
     names(params) <- config$tunepars
 
     ## transform to actual parameter scale
-    for(i in 1:length(params)){
+    for (i in 1:length(params)) {
       params[[i]] <- config$transformations[[i]](params[[i]])
     }
 
     ## convert integer levels to factor levels for categorical params
-    if(length(config$factorlevels)>0)
-      params <- int2fact(params,config$factorlevels)
+    if (length(config$factorlevels) > 0)
+      params <- int2fact(params, config$factorlevels)
 
     ## set fixed parameters (which are not tuned, but are also not set to default value)
-    if(length(config$fixpars)>0)
-      params <- c(params,config$fixpars)
+    if (length(config$fixpars) > 0)
+      params <- c(params, config$fixpars)
 
     #print(data.frame(params))
 
     ## set parameters in relation to other parameters (minbucket relative to minsplit)
     nrel <- length(config$relpars)
-    if(nrel>0){
-      for(i in 1:nrel){
-        params[names(config$relpars)[i]] <- with(params,eval(config$relpars[[i]]))
+    if (nrel > 0) {
+      for (i in 1:nrel) {
+        params[names(config$relpars)[i]] <-
+          with(params, eval(config$relpars[[i]]))
       }
     }
 
     ## generate the learner
     # print(data.frame(params))
-    lrn = makeLearner(config$learner,par.vals=params)
+    lrn = makeLearner(config$learner, par.vals = params)
 
     ## call the model evaluation in a new process via callr
     ## this ensures that the call can be timed-out even when stuck in non-R low-level code
-    if(is.na(timeout)){
-      if(config$task$type=="classif"){
-        measures <- list(mmce,timeboth,timetrain,timepredict)
-      }else if(config$task$type=="regr"){
-        measures = list(rmse,timeboth,timetrain,timepredict)
+    if (is.na(timeout)) {
+      if (config$task$type == "classif") {
+        measures <- list(mmce, timeboth, timetrain, timepredict)
+      } else if (config$task$type == "regr") {
+        measures = list(mlr::rmse, timeboth, timetrain, timepredict)
       }
       set.seed(seed)
-      res <- try(resample(lrn, config$task, config$resample, measures = measures, show.info = FALSE))
-    }else{
-      res <- try(
-        r( # callr::r
-          function(lrn,task,resample,seed){
-            #require(mlr)
-            if(task$type=="classif"){
-              measures <- list(mmce,timeboth,timetrain,timepredict)
-            }else if(task$type=="regr"){
-              measures = list(rmse,timeboth,timetrain,timepredict)
-            }
-            set.seed(seed)
-            resample(lrn, task, resample, measures = measures, show.info = FALSE)
-          },
-          timeout=timeout,
-          args = list(lrn=lrn,task=config$task,resample=config$resample,seed=seed),
-          poll_connection = FALSE,
-          package="mlr"
-        )
-      )
+      res <-
+        try(resample(lrn,
+                     config$task,
+                     config$resample,
+                     measures = measures,
+                     show.info = FALSE))
+    } else{
+      res <- try(r(
+        # callr::r
+        function(lrn, task, resample, seed) {
+          #require(mlr)
+          if (task$type == "classif") {
+            measures <- list(mmce, timeboth, timetrain, timepredict)
+          } else if (task$type == "regr") {
+            measures = list(mlr::rmse, timeboth, timetrain, timepredict)
+          }
+          set.seed(seed)
+          resample(lrn,
+                   task,
+                   resample,
+                   measures = measures,
+                   show.info = FALSE)
+        },
+        timeout = timeout,
+        args = list(
+          lrn = lrn,
+          task = config$task,
+          resample = config$resample,
+          seed = seed
+        ),
+        poll_connection = FALSE,
+        package = "mlr"
+      ))
     }
 
     timestamp <- as.numeric(Sys.time())
 
     ## determine a value to return in case of errors or timeouts.
-    if( class(res)[1] == "try-error"){
-      if(config$task$type=="classif"){ #(based on guessing the most frequent class)
-        lrn <-  makeLearner("classif.rpart",maxdepth=1)
-        measures <- list(mmce,timetrain,timepredict)
-      }else if(config$task$type=="regr"){ #(based on guessing the mean of the observations)
-        lrn <-  makeLearner("regr.rpart",maxdepth=1)
-        measures = list(rmse,timetrain,timepredict)
+    if (class(res)[1] == "try-error") {
+      if (config$task$type == "classif") {
+        #(based on guessing the most frequent class)
+        lrn <-  makeLearner("classif.rpart", maxdepth = 1)
+        measures <- list(mmce, timetrain, timepredict)
+      } else if (config$task$type == "regr") {
+        #(based on guessing the mean of the observations)
+        lrn <-  makeLearner("regr.rpart", maxdepth = 1)
+        measures = list(mlr::rmse, timetrain, timepredict)
       }
-      res = resample(lrn, config$task, config$resample, measures =measures)
+      res = resample(lrn, config$task, config$resample, measures = measures)
       # print(data.frame(res$aggr))
-      return(matrix(c(res$aggr[1],timeout,timeout,timeout,timestamp),1))
-    }else{
+      return(matrix(c(
+        res$aggr[1], timeout, timeout, timeout, timestamp
+      ), 1))
+    } else{
       # print(data.frame(res$aggr))
-      return(matrix(c(res$aggr,timestamp),1))
+      return(matrix(c(res$aggr, timestamp), 1))
     }
   }
   force(objfun)
-  objvecf <- function(x,seed){
+  objvecf <- function(x, seed) {
     res <- NULL
-    for(i in 1:nrow(x))
-      res <- rbind(res,objfun(x[i,,drop=FALSE],seed[i]))
+    for (i in 1:nrow(x))
+      res <- rbind(res, objfun(x[i, , drop = FALSE], seed[i]))
     return(res)
   }
 }
 
-#' @title Surface plot
-#'
-#' @description
-#' A (filled) contour plot or perspective plot of a function, interactive via plotly.
-#'
-#' @param f function to be plotted. The function should either be able to take two vectors or one matrix specifying sample locations. i.e. \code{z=f(X)} or \code{z=f(x2,x1)} where Z is a two column matrix containing the sample locations \code{x1} and \code{x2}.
-#' @param lower boundary for x1 and x2 (defaults to \code{c(0,0)}).
-#' @param upper boundary (defaults to \code{c(1,1)}).
-#' @param type string describing the type of the plot:  \code{"filled.contour"} (default), \code{"contour"},
-#' \code{"persp"} (perspective), or \code{"persp3d"} plot.
-#' Note that "persp3d" is based on the plotly package and will work in RStudio, but not in the standard RGui.
-#' @param s number of samples along each dimension. e.g. \code{f} will be evaluated \code{s^2} times.
-#' @param xlab lable of first axis
-#' @param ylab lable of second axis
-#' @param zlab lable of third axis
-#' @param color.palette colors used, default is \code{terrain.color}
-#' @param title of the plot
-#' @param levels number of levels for the plotted function value. Will be set automatically with default NULL.. (contour plots  only)
-#' @param points1 can be omitted, but if given the points in this matrix are added to the plot in form of dots. Contour plots and persp3d only. Contour plots expect matrix with two columns for coordinates. 3Dperspective expects matrix with three columns, third column giving the corresponding observed value of the plotted function.
-#' @param points2 can be omitted, but if given the points in this matrix are added to the plot in form of crosses. Contour plots and persp3d only.  Contour plots expect matrix with two columns for coordinates. 3Dperspective expects matrix with three columns, third column giving the corresponding observed value of the plotted function.
-#' @param pch1 pch (symbol) setting for points1 (default: 20). (contour plots only)
-#' @param pch2 pch (symbol) setting for points2 (default: 8). (contour plots only)
-#' @param lwd1 line width for points1 (default: 1). (contour plots only)
-#' @param lwd2 line width for points2 (default: 1). (contour plots only)
-#' @param cex1 cex for points1 (default: 1). (contour plots only)
-#' @param cex2 cex for points2 (default: 1). (contour plots only)
-#' @param col1 color for points1 (default: "black"). (contour plots only)
-#' @param col2 color for points2 (default: "black"). (contour plots only)
-#' @param ... additional parameters passed to \code{contour} or \code{filled.contour}
-#'
-#' @importFrom grDevices terrain.colors
-#' @importFrom graphics filled.contour
-#' @importFrom graphics points
-#' @importFrom graphics axis
-#' @importFrom graphics persp
-#' @importFrom graphics contour
-#' @importFrom plotly layout
-#' @importFrom plotly plot_ly
-#' @importFrom plotly add_trace
-#' @importFrom plotly %>%
-#' @importFrom plotly colorbar
-#'
-#' @return plotly visualization (based on \code{\link[plotly]{plot_ly}})
-#'
-#' @export
-plot_function_surface <- function(f=function(x){rowSums(x^2)},
-                                  lower=c(0,0) , upper=c(1,1) ,
-                                  type="filled.contour",
-                                  s=100,
-                                  xlab="x1",ylab="x2", zlab="y",
-                                  color.palette = terrain.colors,
-                                  title=" ",  levels=NULL,
-                                  points1, points2, pch1=20, pch2=8, lwd1=1, lwd2=1, cex1=1, cex2=1, col1="blue", col2="red",
-                                  ...){
-  x <- seq(lower[1], upper[1], length = s)
-  y <- seq(lower[2], upper[2], length = s)
-  if(length(formals(f))==1){
-    fn <- function(a,b){
-      f(cbind(a,b))
-    }
-    z <- outer(x, y, fn)
-  }else if(length(formals(f))==2){
-    z <- outer(x, y, f)
-  }
 
-  if(is.null(levels))
-    levels=pretty(range(z[!is.na(z)]),20)
-
-  if(type=="filled.contour"){
-    p <- plotly::plot_ly(x=x,
-                         y=y,
-                         z=~t(z),
-                         type = "contour",
-                         coloraxis = 'coloraxis') %>% #,showscale=FALSE) %>%
-      layout(title=zlab,
-             xaxis=list(title = xlab),
-             yaxis=list(title = ylab)
-      ) %>%
-      colorbar(title = zlab) %>%
-      layout(coloraxis=list(colorscale='Greys'))
-    if(!missing(points1)){
-      p <- p %>% add_trace(data=points1,x=points1[,1],y=points1[,2], mode = "markers", type = "scatter",
-                           marker = list(size = 5, color = col1, symbol = 200),inherit = FALSE,showlegend=FALSE, hoverinfo='none')
-    }
-    if(!missing(points2)){
-      p <- p %>% add_trace(data=points2,x=points2[,1],y=points2[,2], mode = "markers", type = "scatter",
-                           marker = list(size = 5, color = col2, symbol = 200),inherit = FALSE,showlegend=FALSE, hoverinfo='none')
-    }
-    p
-  }else if(type=="persp3d"){ #perspective plot with plotly
-    p <- plot_ly(z = ~t(z), x = x, y = y,type = "surface")
-    if(!missing(points1))
-      p <- p %>% add_trace(data=points1,x=points1[,1],z=points1[,3],y=points1[,2], mode = "markers", type = "scatter3d",
-                           marker = list(size = 5, color = col1, symbol = 200))
-    if(!missing(points2))
-      p <- p %>% add_trace(data=points2,x=points2[,1],z=points2[,3],y=points2[,2], mode = "markers", type = "scatter3d",
-                           marker = list(size = 6, color = col2, symbol = 200))
-    p
-  }
-}
-
-
-#' @title Surface plot of a model
+#' @title Generate an mlr task from Census KDD data set (+variation)
 #'
-#' @description
-#' A (filled) contour or perspective plot of a fitted model.
+#' @description Prepares the Census data set for mlr.
+#' Performs imputation via: \code{factor = imputeMode()},
+#' \code{integer = imputeMedian()},
+#' \code{numeric = imputeMean()}
 #'
-#' @param object the result list returned by \code{\link[SPOT]{spot}}, importantly including a \code{modelFit}, and the data \code{x}, \code{y}.
-#' @param which a vector with two elements, each an integer giving the two independent variables of the plot
-#' (the integers are indices of the respective data set).
-#' @param constant a numeric vector that states for each variable a constant value that it will take on
-#' if it is not varied in the plot. This affects the parameters not selected by the \code{which} parameter.
-#' By default, this will be fixed to the best known solution, i.e., the one with minimal y-value, according
-#' to \code{which.min(object$y)}. The length of this numeric vector should be the same as the number of columns in \code{object$x}
-#' @param xlab a vector of characters, giving the labels for each of the two independent variables.
-#' @param ylab character, the value of the dependent variable predicted by the corresponding model.
-#' @param type string describing the type of the plot:  \code{"filled.contour"} (default), \code{"contour"},
-#' \code{"persp"} (perspective), or \code{"persp3d"} plot.
-#' Note that "persp3d" is based on the plotly package and will work in RStudio, but not in the standard RGui.
-#' @param ... additional parameters passed to the \code{contour} or \code{filled.contour} function.
+#' @seealso \code{\link{getDataCensus}}
 #'
-#' @return plotly visualization (based on \code{\link[plotly]{plot_ly}})
-#'
-#' @export
-plot_surface <- function(object,which=if(ncol(object$x)>1 & tolower(type) != "singledim"){1:2}else{1},
-                         constant=object$x[which.min(unlist(object$y)),], #best known solution. default.
-                         xlab= paste("x",which,sep=""),ylab="y",type="filled.contour",...){
-  if(!is.null(object$namesx))
-    xlab=object$namesx
-  if(!is.null(object$namesy))
-    ylab=object$namesy
-
-  which <- sort(which)
-  xlab <- xlab[which]
-
-  ## number of variables
-  nvar <- ncol(object$x)
-  ## bounds
-  if(length(which) == 1){
-    lower <- min(object$x)
-    upper <- max(object$x)
-  }else{
-    lower <- apply(object$x[,which],2,min)
-    upper <- apply(object$x[,which],2,max)
-  }
-
-  ## best solution
-  y <- unlist(object$y)
-  ibest <- which.min(y)
-  xbest <- object$x[ibest,]
-  ybest <- y[ibest]
-
-  ## varied variables
-  vary <-  (1:nvar) %in% which
-  modelFit <- object$modelFit
-  force(modelFit)
-  force(nvar)
-  force(vary)
-  force(constant)
-
-  ## Pre Checkup
-  if(nvar < 2 & tolower(type) != "singledim"){
-    stop("The specified plot type is only available for 2 or more dimensions")
-  }
-
-  ## Preparation of function for 'plotFunction()'
-  if(nvar == 2){
-    plotfun <- evaluateModel(modelFit)
-  }else if(nvar > 2){
-    plotfun2 <- evaluateModel(modelFit)
-    plotfun <- function(xx){ #fix constants
-      z2 <- matrix(constant,nrow(xx),nvar,byrow=TRUE)
-      z2[,which(vary)[1]] <- xx[,1]
-      z2[,which(vary)[2]] <- xx[,2]
-      plotfun2(z2)
-    }
-  }else{
-    stop("Dimensionality does not meet plot type")
-  }
-
-  ##Wrapper for plotFun$y
-  plotfuny <- function(xx){
-    res <- plotfun(xx)
-    if(is.list(res)){
-      return(res$y)
-    }
-    res
-  }
-
-  plot_function_surface(f=plotfuny,lower=lower,upper=upper,
-                        type=type,
-                        xlab=xlab[1],ylab=xlab[2],zlab=ylab,
-                        points1=cbind(object$x[,which],y),
-                        points2=matrix(c(xbest[which],ybest),1),
-                        ...)
-}
-
-
-#' @title Sensitivity plot of a model
-#'
-#' @description mlrTools
-#'
-#' @param object the result list returned by \code{\link[SPOT]{spot}}, importantly including a \code{modelFit}, and the data \code{x}, \code{y}.
-#' @param s number of samples along each dimension.
-#' @param agg.sample number of samples for aggregation type (type="agg").
-#' @param xlab a vector of characters, giving the labels for each of the two independent variables.
-#' @param ylab character, the value of the dependent variable predicted by the corresponding model.
-#' @param type string describing the type of the plot:  \code{"best"} (default) shows sensitivity around optimum, \code{"contour"},
-#' \code{"persp"} (perspective), or \code{"persp3d"} plot.
-#' Note that "persp3d" is based on the plotly package and will work in RStudio, but not in the standard RGui.
-#' @param agg.fun function for aggregation (type="agg").
-#' @param ... additional parameters (currently unused).
-#'
-#' @seealso \code{\link[SPOT]{plotFunction}}, \code{\link[SPOT]{plotData}}
-#'
-#' @importFrom ggsci pal_ucscgb
-#' @importFrom stats runif
-#' @importFrom stats aggregate
-#' @importFrom SPOT evaluateModel
-#'
-#' @return plotly visualization (based on \code{\link[plotly]{plot_ly}})
-#'
-#' @export
-#'
-plot_sensitivity <- function(object,
-                             s=100,
-                             xlab= paste("x",1:ncol(object$x),sep=""),
-                             ylab="y",
-                             type="best",
-                             agg.sample=100,
-                             agg.fun=mean,...){
-  if(!is.null(object$namesx))
-    xlab=object$namesx
-  if(!is.null(object$namesy))
-    ylab=object$namesy
-
-  ## number of variables
-  nvar <- ncol(object$x)
-  ## bounds
-  lower <- apply(object$x,2,min)
-  upper <- apply(object$x,2,max)
-
-  ## best solution
-  y <- unlist(object$y)
-  ibest <- which.min(y)
-  xbest <- object$x[ibest,]
-  ybest <- y[ibest]
-
-  ## varied variables
-  modelFit <- object$modelFit
-  force(modelFit)
-  force(nvar)
-
-  ## Preparation of function for evaluation
-  fun <- evaluateModel(modelFit)
-
-  ## scaled best solution
-  xbest_scaled <- (xbest - lower)/(upper-lower)
-
-  fig <- plot_ly(name = "Test", type = 'scatter', mode = 'lines')
-  cols <- pal_ucscgb()(nvar)
-  for(i in 1:nvar){
-    xi <- seq(lower[i], upper[i], length.out = s)
-    xi_scaled <- (xi - lower[i])/(upper[i]-lower[i])
-    if(type=="best"){
-      x <- matrix(xbest,length(xi),nvar,byrow=TRUE)
-      x[,i] <- xi
-      y <- fun(x)
-      fig <- fig %>% add_trace(x=xi_scaled,y=y, mode = 'lines', name=xlab[i], color=cols[i])
-      fig <- fig %>% add_trace(x=xbest_scaled[i],y=ybest, mode = 'markers', name=xlab[i], color=cols[i])
-    }else if(type=="agg"){
-      x <- matrix(runif(agg.sample*nvar*s,lower,upper),,nvar,byrow=T)
-      x[,i] <- rep(xi,agg.sample)
-      y <- fun(x)
-      yagg <- aggregate(y~x[,i],FUN = agg.fun)
-      fig <- fig %>% add_trace(x=xi_scaled,y=yagg$y, mode = 'lines', name=xlab[i], color=cols[i])
-      fig <- fig %>% add_trace(x=xbest_scaled[i],y=ybest, mode = 'markers', name=xlab[i], color=cols[i])
-    }
-  }
-  fig <- fig %>% layout(
-    xaxis=list(title = "parameter range"),
-    yaxis=list(title = ylab)
-  )
-  return(fig)
-}
-
-#' @title Parallel coordinate plot of a data set
-#' @description mlrTools
-#'
-#' @param object the result list returned by \code{\link[SPOT]{spot}}, importantly including a \code{modelFit}, and the data \code{x}, \code{y}.
-#' @param yrange a two-element vector that specifies the range of y values to consider (data outside of that range will be excluded).
-#' @param yvar integer which specifies the variable that is displayed on the color scale. yvar==1 (default) means that the y-variable is shown (tuned measure). Larger integers mean that respective columns from logInfo are used (i.e., yvar specifies the respective column number, starting with 2 for the first logged value).
-#' @param xlab a vector of characters, giving the labels for each of the two independent variables.
-#' @param ylab character, the value of the dependent variable predicted by the corresponding model.
-#' @param ... additional parameters (currently unused).
-#'
-#' @seealso \code{\link[SPOT]{plotFunction}}, \code{\link[SPOT]{plotData}}
-#'
-#' @return plotly parallel coordinate plot ('parcoords') visualization (based on \code{\link[plotly]{plot_ly}})
-#'
-#' @export
-#' @importFrom stats as.formula
-plot_parallel <- function(object,
-                          yrange=NULL,
-                          yvar=1,
-                          xlab= paste("x",1:ncol(x),sep=""),
-                          ylab="y",
-                          ...){
-  if(!is.null(object$namesx))
-    xlab=object$namesx
-  x <- object$x
-  ylog <- cbind(object$y,object$logInfo)
-  y <- ylog[,yvar,drop=FALSE]
-
-
-  if(!is.null(object$namesy)){
-    if(yvar==1){
-      ylab=object$namesy
-    }else if((yvar>1)&(!is.null(object$nameslog))){
-      ylab=object$nameslog[yvar-1]
-    }
-  }
-
-  ## build data frame
-  df <- data.frame(x=x,y=y)
-  colnames(df) <- c(xlab,ylab)
-  if(!is.null(yrange))
-    df <- df[y<=yrange[2] & y>=yrange[1],]
-
-  dims <- list()
-  for(i in 1:length(xlab)){
-    dims[[i]] <- list(label=xlab[i],
-                      values = as.formula(paste0('~', xlab[i]))
-    )
-  }
-
-  fig <- plot_ly(type = 'parcoords',data=df,
-                 line = list(color = as.formula(paste0('~', ylab)),
-                             colorscale = 'Jet',
-                             showscale = TRUE),
-                 dimensions = dims
-  )
-  return(fig)
-}
-
-#' @title Pareto front (as well as non-optimal solutions)
-#'
-#' @description mlrTools
-#'
-#' @param object the result list returned by \code{\link[SPOT]{spot}}, importantly including a \code{modelFit}, and the data \code{x}, \code{y}.
-#' @param xvar integer which specifies the variable that is displayed on the x axis. xvar=1 (default) means that the y-variable is shown (tuned measure). Larger integers mean that respective columns from logInfo are used (then, ylog specifies the respective column number, starting with 2 for the first logged value).
-#' @param yvar integer which specifies the variable that is displayed on the color scale. yvar==1 (default) means that the y-variable is shown (tuned measure). Larger integers mean that respective columns from logInfo are used (then, ylog specifies the respective column number, starting with 2 for the first logged value).
-#' @param xlab character, giving the label for the x-axis of the plot.
-#' @param ylab character, giving the label for the y-axis of the plot.
-#' @param ... additional parameters (currently unused).
-#'
-#' By default, it is assumed that all variables that are plotted (yvar,xvar) are minimized.
-#' If this is not true, assign a negative sign to the respective integer of the xvar and yvar arguments.
-#'
-#' @seealso \code{\link[SPOT]{plotFunction}}, \code{\link[SPOT]{plotData}}
-#'
-#' @return plotly visualization (type 'scatter'), based on \code{\link[plotly]{plot_ly}}
-#'
-#' @export
-#' @importFrom stats as.formula
-#' @importFrom emoa is_dominated
-plot_pareto <- function(object,
-                        xvar = 1, yvar = 2,
-                        xlab= NULL,ylab=NULL,
-                        ...){
-  xsign <- sign(xvar)
-  ysign <- sign(yvar)
-  xvar <- abs(xvar)
-  yvar <- abs(yvar)
-
-  ylog <- cbind(object$y,object$logInfo)
-  y <- ylog[,c(xvar,yvar),drop=F]
-  namesall <- c(object$namesy,object$nameslog)
-  namesy <- namesall[c(xvar,yvar)]
-  x <- data.frame(x=object$x)
-  colnames(x) <- object$namesx
-
-  ## specify the axis names (prefer arguments of names from object, over "y1" / "y2")
-  if(is.null(xlab)){
-    xlab <- namesy[1]
-    if(is.null(xlab)){
-      xlab <- "y1"
-    }
-  }
-
-  if(is.null(ylab)){
-    ylab <- namesy[2]
-    if(is.null(ylab)){
-      xlab <- "y2"
-    }
-  }
-
-  ## build data frame
-  df <- data.frame(y=y)
-  colnames(df) <- c(xlab,ylab)
-  df[,1] <- df[,1] * xsign
-  df[,2] <- df[,2] * ysign
-
-  ## build text strings for the hover info box
-  texts <- NULL
-  for(i in 1:nrow(x)){
-    texts <- c(texts, paste(colnames(x),signif(x[i,],3),sep=": ",collapse="\n"))
-  }
-  nondominatedpoints <- !is_dominated(t(df))
-  ## generate plot
-  fig <- plot_ly(type = 'scatter',data=df,mode='markers',
-                 x=df[,1],
-                 y=df[,2],
-                 color=nondominatedpoints,
-                 colors=c("blue","red"),
-                 text=texts,
-                 hoverinfo='text'
-  )%>%
-    layout(
-      legend = list(title = list(text = "Pareto-\noptimal")),
-      xaxis=list(title = xlab),
-      yaxis=list(title = ylab)
-    )
-  return(fig)
-}
-
-
-#' @title Prepare data for plots
-#'
-#'
-#' @description mlrTools
-#'
-#' @param model a function that can be used to build a model based on the data, e.g. : \code{buildRanger} or \code{buildKriging}. Default is \code{buildRanger}, since it is fast and robust.
-#' @param modelControl a list of control settings for the respective model. Default is an empty list (use default model controls).
-#' @param x a matrix of x-values to be plotted (i.e., columns are the independent variables, rows are samples). Should have same number of rows as y and log.
-#' @param namesx character vector, printable names for the x data. Should have same length as x has columns. Default is x1, x2, ...
-#' @param y a one-column matrix of y-values to be plotted (dependent variable). Should have same number of rows as x and log.
-#' @param namesy character, giving a printable name for y. Default is "y".
-#' @param log matrix, a data set providing (optional) additional dependent variables (but these are not modeled). Should have same number of rows as y and x.
-#' @param nameslog character vector, printable names for the log data. Should have same length as log has columns. Default is NULL (no names).
-#'
-#' @importFrom SPOT buildRanger
-#'
-#' @return list with plotting data and information
-#'
-#' @export
-prepare_data_plot <- function(model=buildRanger,
-                              modelControl=list(),
-                              x,
-                              namesx=paste("x",1:ncol(x),sep=""),
-                              y,
-                              namesy="y",
-                              log=NULL,nameslog=NULL){
-  modelFit <- model(x=x,y=y,control=modelControl)
-  ibest <- which.min(y)
-  xbest <- x[ibest,,drop=FALSE]
-  ybest <- y[ibest,,drop=FALSE]
-  plotobj <- list(x=x,
-                  y=y,
-                  logInfo=log,
-                  xbest=xbest,
-                  ybest=ybest,
-                  namesx=namesx,
-                  namesy=namesy,
-                  nameslog=nameslog,
-                  modelFit=modelFit
-  )
-  return(plotobj)
-}
-
-#' @title Prepare data (results from a tuning run) for plots
-#'
-#' @description
-#' Preparation ot the list elements used for plotting.
-#'
-#' @param data a list containing the various data, e.g., as produced by a \code{\link[SPOT]{spot}} call.
-#' @param model a function that can be used to build a model based on the data, e.g. : \code{buildRanger} or \code{buildKriging}. Default is \code{buildRanger}, since it is fast and robust.
-#' @param modelControl a list of control settings for the respective model. Default is an empty list (use default model controls).
-#' @param ... additional parameters passed to \code{\link{prepare_data_plot}}: \code{namesx}, \code{namesy}, \code{nameslog} character vectors providing names for x, y and logInfo data. Se
-#'
-#' @importFrom SPOT buildRanger
-#'
-#' @return list with plotting data and information generated with \code{\link{prepare_data_plot}}
-#'
-#' @export
-prepare_spot_result_plot <- function(data,model=buildRanger,modelControl=list(),...){
-  prepare_data_plot(model=model,
-                    modelControl = modelControl,
-                    x=data$x,
-                    y=data$y,
-                    log=data$logInfo,
-                    ...
-  )
-}
-
-
-#' @title Get experiment configuration
-#'
-#' @desription Based on an mlr task, this function generates an experiment configuration for
-#' tuning a specified model.
-#'
+#' @param dataset census data set
 #' @param task.type character, either "classif" or "regr".
-#' @param model character, learner chosen via mlr (here: "rpart", kknn", "cvglmnet","ranger","xgboost","svm).
-#' @param rsmpl resample strategy, e.g., generated by \code{makeFixedHoldoutInstance}.
-#' @param task list, e.g., generated by \code{\link{get_task_census}}.
-#' @param data.seed this integer will be used to set the RNG before sampling the test and training data from the complete dataset.
+#' @param data.seed seed
 #'
-#' @return an mlr task with the respective data set
+#' @return an mlr task with the respective data set. Generated with
+#' \code{\link[mlr]{makeClassifTask}} or
+#' \code{\link[mlr]{makeRegrTask}} for
+#' classification and regression repectively.
 #'
+#' @import OpenML
+#' @importFrom  mlr makeFixedHoldoutInstance
+#' @importFrom mlr getTaskSize
+#' @importFrom mlr makeClassifTask
+#' @importFrom mlr makeRegrTask
+#' @importFrom mlr getTaskSize
+#' @importFrom mlr impute
+#' @importFrom mlr imputeMode
+#' @importFrom mlr imputeMedian
+#' @importFrom mlr imputeMean
+#'
+#' @examples
+#' \donttest{
+#' ## Example downloads OpenML data, might take some time:
+#' x <- getDataCensus(
+#' task.type="classif",
+#' nobs = 1e3,
+#' nfactors = "high",
+#' nnumericals = "high",
+#' cardinality = "high",
+#' data.seed=1,
+#' cachedir= "oml.cache",
+#' target = "age")
+#'
+#' taskdata <- getMlrTask(
+#' dataset = x,
+#' task.type = "classif",
+#' data.seed = 1)
+#' }
 #' @export
-#' @import mlr
-get_exp_config <- function(task.type,model,task,rsmpl,data.seed){
+getMlrTask <- function(dataset,
+                       task.type = "classif",
+                       data.seed = 1) {
+  target <- "target"
+  task.nobservations <- nrow(dataset)
+  task.nfeatures <- ncol(dataset)
+  task.numericals <- lapply(dataset, class) != "factor"
+  task.numericals[target] <- FALSE
+  task.factors <- lapply(dataset, class) == "factor"
+  task.factors[target] <- FALSE
+  task.nnumericals <- sum(task.numericals)
+  task.nfactors <- sum(task.factors)
+  task.nlevels <-
+    as.numeric(lapply(dataset, function(x)
+      length(unique(x))))
+  task.nlevels[!task.factors] <- 0
+  task.nlevels.max <- max(task.nlevels)
 
-  ## specify learner rpart
-  if(model=="rpart"){
-    learner <- paste(task.type,"rpart",sep=".")
-    #pars <- getParamSet(learner)
-    #pars
-    tunepars <- c("minsplit","minbucket","cp","maxdepth")
-    lower <- c(1, ## Prob19a
-               0.1, ## Prob19a
-               -10, ## slightly larger than Prob19a who allow -Inf, i.e., zero on actual scale
-               1) ## Prob19a
-    upper <- c(300, ## larger than Prob19a (60)
-               0.5, ## a bit larger than Prob19a  (60)
-               0, ##Prob19a
-               30) ## Prob19a, maximum in rpart
-    type <-  c("integer","numeric","numeric","integer")
-    fixpars <- list()
-    factorlevels <- list()
-    transformations <- c(trans_id,
-                         trans_id,
-                         trans_10pow, ##prob19a use trans_id for cp.
-                         trans_id)
-    dummy=FALSE
-    relpars <- list(minbucket=expression(round(max(minsplit*minbucket,1))))
-  }
 
-  ## specify learner kknn
-  if(model=="kknn"){
-    learner <- paste(task.type,"kknn",sep=".")
-    #pars <- getParamSet(learner)
-    #pars
-    tunepars <- c("k","distance")
-    lower <- c(1, ## Prob19a
-               -1) ##
-    upper <- c(30,  ## Prob19a
-               2) ##
-    type <-  c("integer","numeric")
-    fixpars <- list()
-    factorlevels <- list()
-    transformations <- c(trans_id,
-                         trans_10pow) ##?
-    dummy=FALSE
-    relpars <- list()
-  }
+  if (task.type == "classif")
+    task <- makeClassifTask(data = dataset, target = target)
+  else if (task.type == "regr")
+    task <- makeRegrTask(data = dataset, target = target)
 
-  ## specify learner EN
-  if(model=="cvglmnet"){
-    learner <- paste(task.type,"cvglmnet",sep=".")
-    #pars <- getParamSet(learner)
-    #pars
-    tunepars <- c("alpha","thresh")
-    lower <- c(0, ## Prob19a
-               -8) ## 3 magnitudes below default
-    upper <- c(1, ## Prob19a
-               -1) ## ?
-    type <-  c("numeric","numeric")
-    fixpars <- list()
-    factorlevels <- list()
-    transformations <- c(trans_id, ## Prob19a
-                         trans_10pow) ## this assigns more relevance to lower values.
-    dummy=FALSE
-    relpars <- list()
-  }
-
-  ## specify learner RF
-  if(model=="ranger"){
-    learner <- paste(task.type,"ranger",sep=".")
-    #pars <- getParamSet(learner)
-    #pars
-    tunepars <- c("num.trees","mtry","sample.fraction","replace","respect.unordered.factors")
-    lower <- c(0, ## => 1, Prob19a
-               1, ## minimum, Prob19a
-               0.1, ## Prob19a
-               1, ## => FALSE
-               1) ## => ignore
-    upper <- c(11, ## => 2048 (very similar to Prob19a)
-               getTaskNFeats(task), ## Prob19a but on original scale.
-               1, ## Prob19a
-               2, ## => TRUE
-               2) ## => order
-    type <-  c("numeric","integer","numeric","factor","factor")
-    fixpars <- list(num.threads=1)
-    factorlevels <- list(respect.unordered.factors=c("ignore","order","partition"),
-                         ## Note: partition not used. extreme run time
-                         replace=c(FALSE,TRUE)
-    )
-    transformations <- c(trans_2pow_round, ## deviates from Prob19a.
-                         ## Reasoning: increasing number of trees leads to decreasing change per unit.
-                         trans_id,
-                         trans_id,
-                         trans_id,
-                         trans_id)
-    dummy=FALSE
-    relpars <- list()
-  }
-
-  ## specify learner svm
-  if(model=="svm"){
-    learner <- paste(task.type,"svm",sep=".")
-    if(task.type=="classif"){
-      #pars <- getParamSet(learner)
-      #pars
-      tunepars <- c("kernel","cost","gamma","coef0")
-      #"degree" only with poly kernel
-      lower <-    c(1,   ## radial
-                    -10, ## Prob19a
-                    -10, ## Prob19a
-                    -1)  ## Rijn18a
-      upper <-    c(2,  ## sigmoid
-                    10, ## Prob19a
-                    10, ## Prob19a
-                    1)  ## Rijn18a
-      type <-  c("factor","numeric","numeric","numeric")
-      #factorlevels <- list(kernel= c("linear","polynomial","radial","sigmoid"))
-      ## reduce to sigmoid and radial, due to shorter runtimes.
-      factorlevels <- list(kernel= c("radial","sigmoid"))
-      transformations <- c(trans_id,
-                           trans_2pow, ## Prob19a
-                           trans_2pow, ## Prob19a
-                           trans_id)
-    }else if(task.type=="regr"){
-      #pars <- getParamSet(learner)
-      #pars
-      tunepars <- c("kernel","cost","gamma","coef0","epsilon")
-      lower <-    c(1,   ## radial
-                    -10, ## Prob19a
-                    -10, ## Prob19a
-                    -1,  ## Rijn18a
-                    -8)
-      #upper <-    c(4, 10,  10,  5, 1)
-      upper <-    c(2,  ## sigmoid
-                    10, ## Prob19a
-                    10, ## Prob19a
-                    1,  ## Rijn18a
-                    0)
-      type <-  c("factor","numeric","numeric","numeric","numeric")
-      #factorlevels <- list(kernel= c("linear","polynomial","radial","sigmoid"))
-      ## reduce to sigmoid and radial, due to shorter runtimes.
-      factorlevels <- list(kernel= c("radial","sigmoid"))
-      transformations <- c(trans_id,
-                           trans_2pow, ## Prob19a
-                           trans_2pow, ## Prob19a
-                           trans_id,
-                           trans_10pow
-      )
-    }
-    fixpars <- list()
-    dummy=FALSE
-    relpars <- list()
-  }
-
-  ## specify learner xgb
-  if(model=="xgboost"){
-    learner <- paste(task.type,"xgboost",sep=".")
-    #pars <- getParamSet(learner)
-    #pars
-    tunepars <- c("nrounds","eta","lambda","alpha","subsample","colsample_bytree","gamma","max_depth","min_child_weight")
-    lower <- c(0,  ## reasonable minimum.
-               -10, ## Prob19a
-               -10, ## Prob19a
-               -10, ## Prob19a
-               0.1, ## Prob19a
-               1/getTaskNFeats(task),
-               ## slight deviation from Prob19a.
-               ## reason: 0 makes no sense. At least one feature should be chosen via colsample.
-               -10, ## etwas kleiner als Thom18a
-               1,   ## Prob19a
-               0)   ## Prob19a
-    upper <- c(11,  ## set similar as random forest. (which is less than Prob19a used: 5000)
-               0,  ## Prob19a
-               10,  ## Prob19a
-               10,  ## Prob19a
-               1,   ## Prob19a
-               1,   ## Prob19a
-               10,  ## etwas größer als Thom18a
-               15,  ## Prob19a
-               7) ## Prob19a
-    type <-  c("numeric","numeric","numeric","numeric","numeric","numeric","numeric","integer","numeric")
-    if(task.type=="classif"){
-      fixpars <- list(eval_metric="logloss",# suppress warning given when default metric is used.
-                      nthread=1) #one thread, not parallel
-    }else{
-      fixpars <- list(eval_metric="rmse",# suppress warning given when default metric is used.
-                      nthread=1) #one thread, not parallel
-    }
-    factorlevels <- list()
-    transformations <- c(trans_2pow_round, ## differs from Prob19a
-                         trans_2pow, ## Prob19a
-                         trans_2pow, ## Prob19a
-                         trans_2pow, ## Prob19a
-                         trans_id,   ## Prob19a
-                         trans_id,   ## Prob19a
-                         trans_2pow, ## Thom18a
-                         trans_id,   ## Prob19a
-                         trans_2pow) ## Prob19a
-    dummy=TRUE
-    ## TODO/Note: number of features will be changed. consider when setting bounds. problem for colsample?
-    relpars <- list()
-  }
   ## Impute missing values.
-  task <- impute(
-    task,
-    classes = list(
-      factor = imputeMode(),
-      integer = imputeMedian(),
-      numeric = imputeMean()
-    )
-  )$task
-  if(dummy){
-    task <- createDummyFeatures(task)
-  }
-  ## Determine test/train split
+  task <- impute(task,
+                 classes = list(
+                   factor = imputeMode(),
+                   integer = imputeMedian(),
+                   numeric = imputeMean()
+                 ))$task
+  return(task)
+}
+
+
+#' @title Generate a fixed holdout instance for resampling
+#'
+#' @description Determines test/train split and applies
+#' \code{\link[mlr]{makeFixedHoldoutInstance}}
+#'
+#' @param task mlr task
+#' @param dataset e.g., census data set
+#' @param data.seed seed
+#' @param prop proportion, e.g., 2/3 take 2/3 of the data for training and 1/3
+#' for test
+#'
+#' @return list: an mlr resample generated
+#' with \code{\link[mlr]{makeFixedHoldoutInstance}}
+#'
+#' @seealso \code{\link{getMlrTask}}
+#'
+#' @importFrom  mlr makeFixedHoldoutInstance
+#' @importFrom mlr getTaskSize
+#'
+#' @examples
+#' \donttest{
+#' ## Example downloads OpenML data, might take some time:
+#' dataset <- getDataCensus(
+#' task.type="classif",
+#' nobs = 1e3,
+#' nfactors = "high",
+#' nnumericals = "high",
+#' cardinality = "high",
+#' data.seed=1,
+#' cachedir= "oml.cache",
+#' target = "age")
+#'
+#' taskdata <- getMlrTask(dataset,
+#' task.type = "classif",
+#' data.seed = 1)
+#'
+#' rsmpl <- getMlrResample(task=taskdata,
+#' dataset = dataset,
+#' data.seed = 1,
+#' prop = 2/3)
+#' }
+#' @export
+#'
+getMlrResample <- function(task,
+                           dataset,
+                           data.seed = 1,
+                           prop = NULL) {
   set.seed(data.seed)
-  train.id <- sample(1:getTaskSize(task),size = getTaskSize(task)*0.6,replace=FALSE)
+  train.id <- sample(1:getTaskSize(task),
+                     size = getTaskSize(task) * prop,
+                     replace = FALSE)
   test.id <- (1:getTaskSize(task))[-train.id]
-  return(list(
-    learner=learner,
-    tunepars=tunepars,
-    lower=lower,
-    upper=upper,
-    type=type,
-    fixpars=fixpars,
-    factorlevels=factorlevels,
-    transformations=transformations,
-    dummy=dummy,
-    relpars=relpars,
-    task=task,
-    resample = rsmpl
-  ))
+  rsmpl = makeFixedHoldoutInstance(train.id,
+                                   test.id,
+                                   getTaskSize(task))
+  return(rsmpl)
 }
 
 
 
+#' @title Make mlr learner from conf and hyperparameter vector
+#'
+#' @description calls makelearner
+#'
+#' @param cfg configuration list
+#' @param x hyperparameter vector
+#'
+#' @importFrom mlr makeLearner
+#'
+#' @returns mlr learner
+#'
+#' @export
+makeLearnerFromHyperparameters <- function(x = NULL,
+                                           cfg = NULL){
+# Generate the learner with defaults
+if (is.null(x)) {
+  #lrn <- makeLearner("classif.kknn")
+  lrn <- makeLearner(cfg$learner)
+} else{
+  # Generate the learner with tuned
+  # lrn <- makeLearner("classif.kknn", k=x[1], distance=2^x[2])
+  xt <- x
+  for (i in 1:length(x)) {
+    xt[i] <- (cfg$transformations[[i]](x[i]))
+  }
+
+  argString <- paste0("makeLearner(", "'", cfg$learner, "'", ",")
+  for (i in 1:(length(cfg$tunepars) - 1)) {
+    argString <- paste0(argString,
+                        cfg$tunepars[i], "=xt[", i, "], ")
+  }
+  argString <- paste0(argString,
+                      cfg$tunepars[i + 1], "=xt[", i + 1, "])")
+  #argString
+
+  # Generate the learner with tuned
+  lrn <- eval(parse(text = argString))
+}
+  return(lrn)
+}
+
+#' @title Get predictions from mlr
+#'
+#' @description mlrTools
+#' This function receives a configuration for a tuning experiment,
+#' and returns predicted values.
+#'
+#' @param config list
+#' @param timeout integer, time in seconds after which a model (learner) evaluation will be aborted.
+#'
+#' @return an prediction function that can be called via \code{\link[SPOT]{spot}}.
+#' It basically provides the result from a call to \code{\link[mlr]{resample}}:
+#' \code{resample(lrn, task, resample, measures = measures, show.info = FALSE)},
+#'
+#' @export
+#' @importFrom callr r
+#' @importFrom mlr mmce
+#' @importFrom mlr timeboth
+#' @importFrom mlr timetrain
+#' @importFrom mlr timepredict
+#' @importFrom mlr rmse
+#' @importFrom mlr makeLearner
+#' @importFrom mlr resample
+#' @importFrom mlr acc
+#' @importFrom mlr getMlrOptions
+#' @importFrom mlr holdout
+#'
+getPredf <- function(config, timeout = 3600) {
+  force(config)
+  force(timeout)
+
+  predfun <- function(x=NULL,
+                      seed) {
+    params <- as.list(x)
+    ## set parameter names
+    names(params) <- config$tunepars
+
+    ## transform to actual parameter scale
+    for (i in 1:length(params)) {
+      params[[i]] <- config$transformations[[i]](params[[i]])
+    }
+
+    ## convert integer levels to factor levels for categorical params
+    if (length(config$factorlevels) > 0)
+      params <- int2fact(params, config$factorlevels)
+
+    ## set fixed parameters (which are not tuned, but are also not set to default value)
+    if (length(config$fixpars) > 0)
+      params <- c(params, config$fixpars)
+
+    #print(data.frame(params))
+
+    ## set parameters in relation to other parameters (minbucket relative to minsplit)
+    nrel <- length(config$relpars)
+    if (nrel > 0) {
+      for (i in 1:nrel) {
+        params[names(config$relpars)[i]] <-
+          with(params, eval(config$relpars[[i]]))
+      }
+    }
+
+    ## generate the learner
+    # print(data.frame(params))
+    if(!is.na(x[1])){
+        lrn = makeLearner(config$learner, par.vals = params)
+    } else{
+      ## default (no params)
+      lrn = makeLearner(config$learner)
+    }
+
+    ## call the model evaluation in a new process via callr
+    ## this ensures that the call can be timed-out even when stuck in non-R low-level code
+    ## if (is.na(timeout)) {
+      if (config$task$type == "classif") {
+        measures <- list(mmce, acc, timeboth, timetrain, timepredict)
+      } else if (config$task$type == "regr") {
+        measures = list(mlr::rmse, timeboth, timetrain, timepredict)
+      }
+      set.seed(seed)
+      # getMlrOptions()
+      # res <-
+      #   resample(learner = lrn,
+      #           task = config$task,
+      #           resampling =  config$resample,
+      #            measures = measures,
+      #            show.info = TRUE,
+      #                keep.pred = TRUE)
+
+      res <- holdout(
+        learner=lrn,
+        task = config$task,
+        split = config$prop,
+        stratify = FALSE,
+        measures = measures,
+        models = FALSE,
+        keep.pred = TRUE,
+        show.info = FALSE
+      )
+         # } else{
+    #   res <- try(r(
+    #     # callr::r
+    #     function(lrn, task, resample, seed) {
+    #       #require(mlr)
+    #       if (task$type == "classif") {
+    #         measures <- list(mmce, timeboth, timetrain, timepredict)
+    #       } else if (task$type == "regr") {
+    #         measures = list(rmse, timeboth, timetrain, timepredict)
+    #       }
+    #       set.seed(seed)
+    #       resample(lrn,
+    #                task,
+    #                resample,
+    #                measures = measures,
+    #                show.info = FALSE)
+    #     },
+    #     timeout = timeout,
+    #     args = list(
+    #       lrn = lrn,
+    #       task = config$task,
+    #       resample = config$resample,
+    #       seed = seed
+    #     ),
+    #     poll_connection = FALSE,
+    #     package = "mlr"
+    #   ))
+    # }
+
+    # timestamp <- as.numeric(Sys.time())
+
+    ## determine a value to return in case of errors or timeouts.
+    # if (class(res)[1] == "try-error") {
+    #   if (config$task$type == "classif") {
+    #     #(based on guessing the most frequent class)
+    #     lrn <-  makeLearner("classif.rpart", maxdepth = 1)
+    #     measures <- list(mmce, timetrain, timepredict)
+    #   } else if (config$task$type == "regr") {
+    #     #(based on guessing the mean of the observations)
+    #     lrn <-  makeLearner("regr.rpart", maxdepth = 1)
+    #     measures = list(rmse, timetrain, timepredict)
+    #   }
+    #   res = resample(lrn, config$task, config$resample, measures = measures)
+    #   # print(data.frame(res$aggr))
+    #   return(matrix(c(
+    #     res$aggr[1], timeout, timeout, timeout, timestamp
+    #   ), 1))
+    # } else{
+      #print(data.frame(res$aggr))
+      #return(matrix(c(res$aggr, timestamp), 1))
+      print(res)
+      return(res)
+    #}
+  }
+  force(predfun)
+  objvecf <- function(x=NULL,
+                      seed) {
+    # res <- NULL
+    # for (i in 1:nrow(x))
+    # res <- rbind(res, predfun(x[i, , drop = FALSE], seed[i]))
+    res <- predfun(x, seed)
+    return(res)
+  }
+}
+
+
+
+
+
+#' #' @title Predict machine learning models on Census data (deprecated)
+#' #'
+#' #' @param x matrix hyperparameter, e.g., result from \code{\link[SPOT]{spot}}
+#' #' @param model character ml model, e.g., \code{"kknn"}
+#' #' run: \code{result$xbest}. If \code{NULL}, default parameters will be used.
+#' #' Default: \code{NULL}.
+#' #' @param target target
+#' #' @param task.type class/reg
+#' #' @param nobs number of obsvervations, max: 229,285
+#' #' @param nfactors (character) number of factor variables
+#' #' @param nnumericals (character) number of numerical variables
+#' #' @param cardinality (character) cardinality
+#' #' @param cachedir cachedir ("oml.cache")
+#' #' @param k number of repeats
+#' #' @param prop split proportion. Default: \code{c(3/5,1)}.
+#' #' @param verbosity verbsity. Default: 0
+#' #'
+#' #' @importFrom mlr train
+#' #' @importFrom mlr getHyperPars
+#' #' @importFrom mlr summarizeColumns
+#' #' @importFrom mlr normalizeFeatures
+#' #' @importFrom mlr createDummyFeatures
+#' #' @importFrom dplyr bind_rows
+#' #' @importFrom dplyr mutate
+#' #' @importFrom dplyr select
+#' #' @importFrom dplyr filter
+#' #'
+#' #' @return list of matrices with predictions and true values
+#' #'
+#' #' @export
+#' predMlCensusDeprecated <- function(x = NULL,
+#'                          model = NULL,
+#'                          target = NULL,
+#'                          task.type = "classif",
+#'                          nobs = 1e4,
+#'                          nfactors = "high",
+#'                          nnumericals = "high",
+#'                          cardinality = "high",
+#'                          cachedir = "oml.cache",
+#'                          k = 1,
+#'                          prop = c(3/5, 1),
+#'                          verbosity = 0) {
+#'
+#'   dataset <- NULL
+#'   trueY <- NULL # matrix(NA, ncol=k,)
+#'   hatY  <- NULL # matrix(NA, ncol=k,)
+#'   for (i in 1:k) {
+#'
+#'     data.seed <- i
+#'
+#'     # dataOML <- getDataCensus(
+#'     #   task.type = task.type,
+#'     #   nobs = nobs,
+#'     #   nfactors = nfactors,
+#'     #   nnumericals = nnumericals,
+#'     #   cardinality = cardinality,
+#'     #   data.seed = data.seed,
+#'     #   cachedir = cachedir,
+#'     #   target = target
+#'     # )
+#'
+#'     # FIXME BEGIN
+#'     # library("dplyr")
+#'     # library("OpenML")
+#'     # library("mlr")
+#'     # library("plotly")
+#'     # library("SPOT")
+#'     # library("SPOTMisc")
+#'     # library("farff")
+#'     # if (packageVersion("SPOT") < "2.9.0") message("Please update 'SPOT'")
+#'     # if (packageVersion("SPOTMisc") < "1.10.0") message("Please update 'SPOTMisc'")
+#'     #
+#'     # x <- NULL
+#'     # model <- "xgboost"
+#'     # model <- "kknn"
+#'     # model <- "rpart"
+#'     # target <- "age"
+#'     # task.type <- "classif"
+#'     # nobs <- 1e4
+#'     # nfactors <- "high"
+#'     # nnumericals <- "high"
+#'     # cardinality <- "high"
+#'     # cachedir <- "oml.cache"
+#'     # k <- 1
+#'     # prop <- c(3/5, 1)
+#'     # data.seed <- 1
+#'     # verbosity <- 1
+#'     # dataset <- NULL
+#'     # trueY <- NULL # matrix(NA, ncol=k,)
+#'     # hatY  <- NULL # matrix(NA, ncol=k,)
+#'     # FIXME END
+#'
+#'     dataOML <- getDataCensus(task.type = task.type,
+#'                              nobs = nobs,
+#'                              nfactors = nfactors,
+#'                              nnumericals = nnumericals,
+#'                              cardinality = cardinality,
+#'                              data.seed= data.seed,
+#'                              cachedir = cachedir,
+#'                              target = target)
+#'     if(verbosity>0) summarizeColumns(dataOML)
+#'
+#'     # get trainCensus/valCensus/testCensus data
+#'     data <- getCensusTrainValTestData(
+#'       dfCensus = dataOML,
+#'       task.type = task.type,
+#'       nobs = nobs,
+#'       nfactors = nfactors,
+#'       nnumericals = nnumericals,
+#'       cardinality = cardinality,
+#'       data.seed = data.seed,
+#'       prop = prop, # 4 / 5,
+#'       cachedir = cachedir,
+#'       DL = FALSE,
+#'       target = target)
+#'
+#'
+#'       train_orig <- data$trainCensus
+#'       test_orig <- data$testCensus
+#'
+#'       ## recombine for easy data prep:
+#'       train <- train_orig %>%
+#'         dplyr::mutate(dataset = "train")
+#'       test <- test_orig %>%
+#'         dplyr::mutate(dataset = "test")
+#'       combined <- dplyr::bind_rows(train, test)
+#'
+#'       # combined is similar to dataOML, but has one new column: dataset (train/test)
+#'       if(verbosity>0) summarizeColumns(combined)
+#'
+#'       # Impute missing values by field type
+#'       imp <- impute(
+#'         combined,
+#'         classes = list(
+#'           factor = imputeMode(),
+#'           integer = imputeMean(),
+#'           numeric = imputeMean()
+#'         )
+#'       )
+#'       combined <- imp$data
+#'
+#'       # Show column summary
+#'       if(verbosity>0) summarizeColumns(combined)
+#'
+#'       # normalize features
+#'       # combined <- normalizeFeatures(combined, target = target)
+#'       # if(verbosity>0) summarizeColumns(combined)
+#'
+#'       # dummy encoding:
+#'       if(model=="xgboost"){
+#'       factorCols <- colnames(combined)[sapply(combined, is.factor)]
+#'       factorCols <-  factorCols[!factorCols %in% target]
+#'
+#'       combined <- createDummyFeatures(
+#'         combined, target = target,
+#'         cols = factorCols
+#'       )
+#'
+#'       if(verbosity>0) summarizeColumns(combined)
+#'       }
+#'
+#'       train <- combined %>%
+#'         dplyr::filter(dataset == "train") %>%
+#'         dplyr::select(-dataset)
+#'
+#'       test <- combined %>%
+#'         dplyr::filter(dataset == "test") %>%
+#'         dplyr::select(-dataset)
+#'
+#'       trainTask <- makeClassifTask(data = train, target = target, positive = "TRUE")
+#'       testTask <- makeClassifTask(data = test, target = target)
+#'
+#'       cfg <- getModelConf(
+#'         task.type = task.type,
+#'         model = model,
+#'         nFeatures = sum(testTask$task.desc$n.feat))
+#'       if(verbosity >0) print(cfg)
+#'
+#'       lrn <- makeLearnerFromHyperparameters(x=x,
+#'                                             cfg=cfg)
+#'       if(verbosity >0) print(getHyperPars(lrn))
+#'
+#'       # Create a model
+#'       model <- train(lrn, task = testTask)
+#'
+#'       newdata.pred <- predict(model, testTask)
+#'       # newdata.pred$data$truth
+#'       # newdata.pred$data$response
+#'
+#'     trueY <- cbind(trueY, as.matrix(as.integer(newdata.pred$data$truth) -1, ncol = 1))
+#'     hatY <- cbind(hatY, as.matrix(as.double(newdata.pred$data$response) - 1,
+#'                                   ncol = 1))
+#'
+#'   } # end for loop
+#'   return(list(trueY = trueY, hatY = hatY))
+#' }
 
 
 

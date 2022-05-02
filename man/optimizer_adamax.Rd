@@ -40,6 +40,12 @@ this value.}
 Adamax optimizer from Section 7 of the [Adam paper](https://arxiv.org/abs/1412.6980v8).
 It is a variant of Adam based on the infinity norm.
 }
+\note{
+To enable compatibility with the ranges of the learning rates
+of the other optimizers, the learning rate \code{learning_rate}
+is internally mapped to \code{2 * learning_rate}. That is,
+a learning rat of 0.001 will be mapped to 0.002 (which is the default.)
+}
 \seealso{
 Other optimizers: 
 \code{\link{optimizer_adadelta}()},

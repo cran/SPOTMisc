@@ -842,12 +842,12 @@ knitr::opts_chunk$set(
 #  install.packages(c(
 #  "benchmarkme", "callr", "emoa", "ggsci", "jsonlite", "keras", "magrittr", "mlr", "plotly", "RColorBrewer", "reticulate", "rpart.plot", "sensitivity", "smoof", "tensorflow", "tfdatasets"))
 #  install.packages(
-#    "~/workspace/spotmisc/packages/SPOT_2.7.6.tar.gz",
+#    "~/workspace/spotmisc/packages/SPOT_2.8.4.tar.gz",
 #    repos = NULL,
 #    type = "source"
 #  )
 #  install.packages(
-#    "~/workspace/spotmisc/packages/SPOTMisc_1.6.6.tar.gz",
+#    "~/workspace/spotmisc/packages/SPOTMisc_1.8.0.tar.gz",
 #    repos = NULL,
 #    type = "source"
 #  )
@@ -912,4 +912,84 @@ knitr::opts_chunk$set(
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist11", as.numeric(Sys.time()), ".RData"))
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  # install.packages("~/workspace/book/packages/SPOTMisc_1.8.2.tar.gz", repos = NULL, type = "source")
+#  # install.packages("~/workspace/book/packages/SPOT_2.8.4.tar.gz", repos = NULL, type = "source")
+#  library("SPOTMisc")
+#  if (packageVersion("SPOTMisc") < "1.8.0") stop("Please update 'SPOT'")
+#  library("SPOT")
+#  if (packageVersion("SPOT") < "2.8.4") stop("Please update 'SPOT'")
+#  
+#   #  "dropout" =  x[1]: 0.1--0.5
+#   #  "dropoutfact" =  x[2]: 1-1
+#   #  "units" = x[3]: 1-1
+#   #  "unitsfact" = x[4]: 1-1
+#   #  "learning_rate" =  x[5]: 1e-5--1e-2
+#   #  "epochs" = x[6]: 3-6
+#   #  "beta_1" =  x[7]: 0.9--0.999
+#   #  "beta_2" =  x[8]: 0.99--0.9999
+#   #  "layers" =  x[9]: 1-1
+#   #  "epsilon" = x[10]: 1e-8--1e-6
+#  
+#  lower <- c(0.1, 1, 1, 1, 1e-5, 3, 0.9,  0.99,    1, 1e-8)
+#  upper <- c(0.5, 1, 1, 1, 1e-2, 6, 0.999, 0.9999, 1, 1e-6)
+#  types <-  rep("numeric", length(lower))
+#  types[c(3, 4, 6, 9)] <- "integer"
+#  f2 <- function(x) {
+#    2 ^ x
+#  }
+#  transformFun <- rep("identity", length(lower))
+#  transformFun[c(3, 4, 6, 9)] <- "f2"
+#  kerasConf <- getKerasConf()
+#  kerasConf$verbose <- 0
+#  kerasConf$resDummy <- FALSE
+#  Ninit <- 2 * length(lower)
+#  Rinit <- 2
+#  replicates <- 2
+#  
+#  task.type <- "classif"
+#  nobs <- 1e4 # max: 229285
+#  nfactors = "high"
+#  nnumericals <- "high"
+#  cardinality = "high"
+#  data.seed <- 1
+#  tuner.seed <- 1
+#  timebudget <-  3600
+#  timeout <- timebudget/20
+#  data <- getCensusTrainValTestData(task.type=task.type,
+#                                    nobs=nobs,
+#                                    nfactors = nfactors,
+#                                    nnumericals = nnumericals,
+#                                    cardinality = cardinality,
+#                                    data.seed =1)
+#  specCensusPrep <- censusDataPrep(data=data, batch_size = 32)
+#  
+#  res <- spot(
+#    x = NULL,
+#    fun = funKerasCensus,
+#    lower = lower,
+#    upper = upper,
+#    control = list(
+#      funEvals = 20 * length(lower),
+#      multiStart = 2,
+#      noise = TRUE,
+#      types = types,
+#      transformFun = transformFun,
+#      replicates = replicates,
+#      designControl = list(replicates = Rinit,
+#                           size = Ninit),
+#      model = buildKriging,
+#      optimizer = optimDE,
+#      modelControl = list(target = "y"),
+#      plots = FALSE,
+#      progress = TRUE,
+#      seedFun = 1,
+#      seedSPOT = 1,
+#      verbosity=0
+#    ),
+#    kerasConf = kerasConf,
+#    specCensusPrep =specCensusPrep
+#  )
+#  save(res, file = paste0("rescs3Census01", as.numeric(Sys.time()), ".RData"))
 
