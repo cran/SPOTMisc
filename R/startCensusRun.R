@@ -77,8 +77,8 @@
 #' @export
 startCensusRun <- function(modelList = list("dl", "cvglmnet",  "kknn",   "ranger", "rpart" ,  "svm", "xgboost"),
                           runNr = "000",
-                          SPOTVersion = "2.9.50",
-                          SPOTMiscVersion = "1.18.12",
+                          SPOTVersion = "2.10.12",
+                          SPOTMiscVersion = "1.19.2",
                           timebudget =  3600, ## secs
                           target =  "age",
                           cachedir =  "oml.cache",
@@ -106,8 +106,8 @@ startCensusRun <- function(modelList = list("dl", "cvglmnet",  "kknn",   "ranger
                           imputeCriteriaFuns = list(is.infinite, is.na, is.nan),
                           krigingTarget =  "ei",
                           krigingUseLambda =  TRUE,
-                          krigingReinterpolate =  FALSE,
-                          defaultAsStartingPoint =  FALSE,
+                          krigingReinterpolate =  TRUE,
+                          defaultAsStartingPoint =  TRUE,
                           plots =  FALSE,
                           Rinit =  2,
                           replicates =  2,

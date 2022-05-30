@@ -5,7 +5,9 @@
 \title{Surface plot}
 \usage{
 plot_function_surface(
-  f = function(x) {     rowSums(x^2) },
+  f = function(x) {
+     rowSums(x^2)
+ },
   lower = c(0, 0),
   upper = c(1, 1),
   type = "filled.contour",

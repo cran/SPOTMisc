@@ -1,6 +1,9 @@
 #' @title Get model configuration
 #'
 #' @description Configure machine and deep learning models
+#' @param modelArgs list with information about model, active variables etc. Note:
+#' \code{argList} will replace the other arguments. Use \code{argList$model} instead
+#' of \code{model} etc.
 #' @param model machine or deep learning model (character). One of the following:
 #' \describe{
 #'		\item{\code{"cvglmnet"}}{glm net.}
@@ -9,9 +12,12 @@
 #'		\item{\code{"rpart"}}{recursive partitioning and  regression trees, \code{\link[rpart]{rpart}}}
 #'		\item{\code{"svm"}}{support vector machines.}
 #'		\item{\code{"xgboost"}}{gradient boosting, \code{\link[xgboost]{xgb.train}}.}
-#'		\item{\code{"dl"}}{deep learning}}
+#'		\item{\code{"dl"}}{deep learning: dense network.}
+#'		\item{\code{"cnn"}}{deep learning: convolutionary network}.}
 #' @param task.type character, either \code{"classif"} or \code{"regr"}.
 #' @param nFeatures number of features, e.g., \code{sum(task$task.desc$n.feat)}
+#' @param active vector of activated tunepars, e.g., \code{c("minsplit", "maxdepth")}
+#' for model \code{"rpart"}
 #'
 #' @return Returns returns a list of the
 #' machine learning model configuration and corresponding hyperparameters:
@@ -29,15 +35,41 @@
 #' @examples
 #' # Get hyperparameter names and their defaults for fitting a
 #' # (recursive partitioning and  regression trees) model:
-#' cfg <- getModelConf("rpart")
+#' modelArgs <- list(model = "rpart")
+#' cfg <- getModelConf(modelArgs)
 #' cfg$tunepars
 #' cfg$defaults
+#' ## do not use anymore:
+#' cfg <- getModelConf(model="rpart")
+#' cfg$tunepars
+#' cfg$defaults
+#' modelArgs <- list(model="rpart", active = c("minsplit", "maxdepth"))
+#' cfgAct <- getModelConf(modelArgs)
+#' cfgAct$tunepars
+#' cfgAct$defaults
 #'
 #' @export
 #'
-getModelConf <- function(model,
+getModelConf <- function(modelArgs=NULL,
+                         model,
                          task.type = NULL,
-                         nFeatures = NULL){
+                         nFeatures = NULL,
+                         active = NULL){
+
+  if(is.list(modelArgs)){
+  a0 <- list(model=NULL,
+             task.type = NULL,
+             nFeatures = NULL,
+             active = NULL)
+  a0[names(modelArgs)] <- modelArgs
+  modelArgs <- a0
+  rm(a0)
+  ## unlist modelArgs list:
+  model <- modelArgs$model
+  task.type <- modelArgs$task.type
+  nFeatures <- modelArgs$nFeatures
+  active = modelArgs$active
+  }
 
   learner <- tunepars <- lower <- upper <- type <- fixpars <- NULL
   factorlevels <- transformations <- dummy <-  relpars <- NULL
@@ -345,7 +377,7 @@ getModelConf <- function(model,
     relpars <- list()
   }
 
-  ## specify learner rpart
+  ## specify learner deep learning (dense network)
   if(model=="dl"){
     learner <- NULL
     tunepars <- c("dropout",
@@ -374,16 +406,58 @@ getModelConf <- function(model,
     dummy <- FALSE
     relpars <- list()
   }
-    return(list(learner = learner,
-              tunepars = tunepars,
-              defaults = defaults,
-              lower = lower,
-              upper = upper,
-              type = type,
-              fixpars = fixpars,
-              factorlevels = factorlevels,
-              transformations = transformations,
-              dummy = dummy,
-              relpars = relpars)
-         )
+  ## specify learner cnn deep learning (convolutionary network)
+  if(model=="cnn"){
+    learner <- NULL
+    tunepars <- c("nFilters",
+                  "kernelSize",
+                  "activation",
+                  "poolSize", # (factor: only off=0 or on=1)
+                  "learning_rate",
+                  "epochs",
+                  "beta_1",
+                  "beta_2",
+                  "layers",
+                  "epsilon",
+                  "optimizer")
+    lower <-   c(4,  2,  1, 0, 1e-6, 3, 0.9,  0.99,   1, 1e-9, 1)
+    defaults <- c(5,  2,  2, 1, 1e-3, 4, 0.9,  0.999,  1, 1e-7, 5)
+    upper <-   c(6,  3,  2,  1, 1e-2, 7, 0.99, 0.9999, 3, 1e-8, 7)
+
+    type <-  rep("numeric", length(lower))
+    type[c(1,2,6,9)] <- "integer"
+    type[c(3,4,11)] <- "factor"
+
+    transformations <- rep("identity", length(lower))
+    transformations[c(1,6)] <- "trans_2pow_round"
+    transformations[2] <- "trans_odd_round"
+    fixpars <- list()
+    factorlevels <- list()
+    dummy <- FALSE
+    relpars <- list()
+  }
+
+  returnList <- list(learner = learner,
+                     tunepars = tunepars,
+                     defaults = matrix(defaults,nrow=1),
+                     lower = lower,
+                     upper = upper,
+                     type = type,
+                     fixpars = fixpars,
+                     factorlevels = factorlevels,
+                     transformations = transformations,
+                     dummy = dummy,
+                     relpars = relpars)
+
+  if(!is.null(active)){
+    activeInd <- which(tunepars %in% active)
+    returnList$tunepars <- returnList$tunepars[activeInd]
+    returnList$defaults <- returnList$defaults[activeInd]
+    returnList$lower <- returnList$lower[activeInd]
+    returnList$upper <- returnList$upper[activeInd]
+    returnList$type <- returnList$type[activeInd]
+    returnList$transformations <- returnList$transformations[activeInd]
+  }
+
+  return(returnList)
 }

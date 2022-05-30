@@ -4,14 +4,14 @@
 \alias{funKerasTransferLearning}
 \title{funKerasTransferLearning}
 \usage{
-funKerasTransferLearning(x, kConf = getKerasConf(), data = NULL)
+funKerasTransferLearning(x, kerasConf = getKerasConf(), data = NULL)
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
 Rows for points and columns for dimension.}
 
-\item{kConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
-Default: \code{kConf = getKerasConf()}.}
+\item{kerasConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
+Default: \code{kerasConf = getKerasConf()}.}
 
 \item{data}{data}
 }
@@ -71,7 +71,7 @@ res <- spot(x = NULL,
                            progress = TRUE,
                            seedFun = 1,
                            seedSPOT = 1,
-                           kConf = kerasConf)
+                           kerasConf = kerasConf)
                            )
  save(res, file = paste0("resKerasTransferLearning", as.numeric(Sys.time()),".RData"))
 
@@ -110,7 +110,7 @@ res <- spot(x = NULL,
                            progress = TRUE,
                            seedFun = 1,
                            seedSPOT = 1,
-                           kConf = kerasConf))
+                           kerasConf = kerasConf))
 save(res,file = paste0("resKerasTransferLearningValidationLoss04",
 as.numeric(Sys.time()),".RData"))
 
@@ -151,7 +151,7 @@ res <- spot(x = NULL,
                            progress = TRUE,
                            seedFun = 1,
                            seedSPOT = 1,
-                           kConf = kerasConf))
+                           kerasConf = kerasConf))
 save(res,file = paste0("resKerasTransferLearningNegValidationAccuracy05",
 as.numeric(Sys.time()),".RData"))
 
@@ -192,7 +192,7 @@ res <- spot(x = NULL,
                            progress = TRUE,
                            seedFun = 1,
                            seedSPOT = 1,
-                           kConf = kerasConf)
+                           kerasConf = kerasConf)
 )
 save(res, file = paste0("resKerasTransferLearningTrainingLoss06",
 as.numeric(Sys.time()),".RData"))

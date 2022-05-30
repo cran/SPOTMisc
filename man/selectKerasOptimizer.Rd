@@ -5,7 +5,7 @@
 \title{Select keras optimizer}
 \usage{
 selectKerasOptimizer(
-  name,
+  optimizer,
   learning_rate = 0.01,
   momentum = 0,
   decay = 0,
@@ -21,7 +21,7 @@ selectKerasOptimizer(
 )
 }
 \arguments{
-\item{name}{integer specifying the algorithm. Can be one of the following:
+\item{optimizer}{integer specifying the algorithm. Can be one of the following:
 \code{1=SDG}, \code{2=RMSPROP}, \code{3=ADAGRAD}, \code{4=ADADELTA},
 \code{5=ADAM}, \code{6=ADAMAX}, or \code{7=NADAM}.
 
@@ -65,5 +65,6 @@ the paper "On the Convergence of Adam and Beyond".}
 Optimizer for use with \code{\link{compile.keras.engine.training.Model}}.
 }
 \description{
-Select keras optimizer
+Select one of the following optimizers:
+"SDG", "RMSPROP", "ADAGRAD", "ADADELTA", "ADAM", "ADAMAX", "NADAM".
 }

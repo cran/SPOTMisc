@@ -134,7 +134,7 @@ knitr::opts_chunk$set(
 #                             progress = TRUE,
 #                             seedFun = 1,
 #                             seedSPOT = 1),
-#              kConf = kerasConf)
+#              kerasConf = kerasConf)
 #  res01 <- res
 #  # save(res01, file="exp01.RData")
 
@@ -171,7 +171,7 @@ knitr::opts_chunk$set(
 #                             progress = TRUE,
 #                             seedFun = 1,
 #                             seedSPOT = 1),
-#              kConf = kerasConf)
+#              kerasConf = kerasConf)
 #  res02 <- res
 #  #save(res02, file="exp02.RData")
 
@@ -198,7 +198,7 @@ knitr::opts_chunk$set(
 #             "numeric")
 #  ### First example: simple function call:
 #  x <- matrix(lower, 1,)
-#  funKerasTransferLearning(x, kConf = kerasConf)
+#  funKerasTransferLearning(x, kerasConf = kerasConf)
 #  kerasConf$verbose <- 1
 #  res <- spot(x = NULL,
 #              fun = funKerasTransferLearning,
@@ -211,7 +211,7 @@ knitr::opts_chunk$set(
 #                             progress = TRUE,
 #                             seedFun = 1,
 #                             seedSPOT = 1),
-#              kConf = kerasConf)
+#              kerasConf = kerasConf)
 #  # save(res, file = "run002.RData")
 
 ## ---- eval = FALSE------------------------------------------------------------
@@ -282,7 +282,7 @@ knitr::opts_chunk$set(
 #      seedFun = 1,
 #      seedSPOT = 1
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist02", as.numeric(Sys.time()), ".RData"))
@@ -341,7 +341,7 @@ knitr::opts_chunk$set(
 #      verbosity = 0,
 #      designControl=list(size=n)
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist02Default", as.numeric(Sys.time()), ".RData"))
@@ -415,7 +415,7 @@ knitr::opts_chunk$set(
 #      seedFun = 1,
 #      seedSPOT = 1
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist03", as.numeric(Sys.time()),".RData"))
@@ -489,7 +489,7 @@ knitr::opts_chunk$set(
 #      seedFun = 1,
 #      seedSPOT = 1
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist07", as.numeric(Sys.time()),".RData"))
@@ -563,7 +563,7 @@ knitr::opts_chunk$set(
 #      seedFun = 1,
 #      seedSPOT = 1
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist08", as.numeric(Sys.time()),".RData"))
@@ -637,7 +637,7 @@ knitr::opts_chunk$set(
 #      seedFun = 1,
 #      seedSPOT = 1
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist09", as.numeric(Sys.time()),".RData"))
@@ -711,7 +711,7 @@ knitr::opts_chunk$set(
 #      seedFun = 1,
 #      seedSPOT = 1
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist10", as.numeric(Sys.time()),".RData"))
@@ -752,7 +752,7 @@ knitr::opts_chunk$set(
 #                             seedFun = 1,
 #                             seedSPOT = 1,
 #                             verbosity = 1),
-#                             kConf = kerasConf
+#                             kerasConf = kerasConf
 #  )
 #  save(res, file = paste0("resKerasTransferLearning04", as.numeric(Sys.time()),".RData"))
 
@@ -792,7 +792,7 @@ knitr::opts_chunk$set(
 #                             seedFun = 1,
 #                             seedSPOT = 1,
 #                             verbosity = 1),
-#                             kConf = kerasConf
+#                             kerasConf = kerasConf
 #  )
 #  save(res, file = paste0("resKerasTransferLearning05", as.numeric(Sys.time()),".RData"))
 
@@ -834,7 +834,7 @@ knitr::opts_chunk$set(
 #                             seedFun = 1,
 #                             seedSPOT = 1,
 #                             verbosity = 1),
-#                             kConf = kerasConf
+#                             kerasConf = kerasConf
 #  )
 #  save(res, file = paste0("resKerasTransferLearning06", as.numeric(Sys.time()),".RData"))
 
@@ -908,7 +908,7 @@ knitr::opts_chunk$set(
 #      seedSPOT = 1,
 #      verbosity=0
 #    ),
-#    kConf = kerasConf,
+#    kerasConf = kerasConf,
 #    data = mnist
 #  )
 #  save(res, file = paste0("resKerasMnist11", as.numeric(Sys.time()), ".RData"))

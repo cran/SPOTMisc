@@ -4,14 +4,14 @@
 \alias{funKerasMnist}
 \title{funKerasMnist}
 \usage{
-funKerasMnist(x, kConf = getKerasConf(), data = getMnistData())
+funKerasMnist(x, kerasConf, data)
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
 Rows for points and columns for dimension.}
 
-\item{kConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
-Default: \code{kConf = getKerasConf()}.}
+\item{kerasConf}{List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
+Default: \code{kerasConf = getKerasConf()}.}
 
 \item{data}{mnist data set. Default: \code{\link{getMnistData}}.}
 }
@@ -39,35 +39,86 @@ if(PYTHON_RETICULATE){
 library("SPOTMisc")
 library("SPOT")
 kerasConf <- getKerasConf()
-lower <- c(1e-6, 1e-6, 16,0.6, 1e-9, 10, 6,0.4,0.99,1,1e-8)
-upper <- c(0.5, 0.5, 512, 1.5, 1e-2, 50, 10,0.999,0.999,10,6e-8)
-types <- c("numeric",  "numeric",  "integer",  "numeric",  "numeric",
-           "integer",  "integer",  "numeric",  "numeric",  "integer",
-           "numeric")
+## The following two settings are default:
+kerasConf$encoding = "oneHot"
+kerasConf$model = "dl"
+## get the data with the correct encoding
+mnist <- getMnistData(kerasConf)
+## get the model
+cfg <-  getModelConf(kerasConf)
 
 ### First example: simple function call:
-x <- matrix(lower, 1,)
-funKerasMnist(x, kConf = kerasConf)
+x <- matrix(cfg$default, nrow=1)
+if (length(cfg$transformations) > 0) {  x <- transformX(xNat=x, fn=cfg$transformations)}
+funKerasMnist(x, kerasConf = kerasConf, data = mnist)
+### Use convnet:
+kerasConf <- getKerasConf()
+kerasConf$encoding <- "tensor"
+kerasConf$model <- "cnn"
+mnist <- getMnistData(kerasConf)
+cfg <-  getModelConf(kerasConf)
+x <- matrix(cfg$default, nrow=1)
+if (length(cfg$transformations) > 0) {  x <- transformX(xNat=x, fn=cfg$transformations)}
+funKerasMnist(x, kerasConf = kerasConf, data=mnist)
 
 ### Second example: evaluation of several (three) hyperparameter settings:
+x <- matrix(cfg$default, nrow=1)
+if (length(cfg$transformations) > 0) {  x <- transformX(xNat=x, fn=cfg$transformations)}
 xxx <- rbind(x,x,x)
-funKerasMnist(xxx, kConf = kerasConf)
+funKerasMnist(xxx, kerasConf = kerasConf, data=mnist)
 
-### Third example: spot call with extended verbosity:
-kerasConf$verbose <- 1
-res <- spot(x = NULL,
+### Third example: spot call (dense network):
+kerasConf <- getKerasConf()
+kerasConf$verbose <- 0
+kerasConf$encoding = "oneHot"
+kerasConf$model = "dl"
+## get the data with the correct encoding
+mnist <- getMnistData(kerasConf)
+## get the model
+cfg <-  getModelConf(kerasConf)
+## max 32 training epochs
+cfg$upper[6] <- 5
+resDl <- spot(x = NULL,
             fun = funKerasMnist,
-            lower = lower,
-            upper = upper,
-            control = list(funEvals=50,
+            lower = cfg$lower,
+            upper = cfg$upper,
+            control = list(funEvals=15,
+                         transformFun = cfg$transformations,
+                         types = cfg$type,
                          noise = TRUE,
-                         types = types,
                          plots = TRUE,
                          progress = TRUE,
                          seedFun = 1,
                          seedSPOT = 1),
-                         kConf = kerasConf)
-  }
+                         kerasConf = kerasConf,
+                         data = mnist)
+
+### Fourth example: spot call (convnet):
+kerasConf <- getKerasConf()
+kerasConf$verbose <- 1
+kerasConf$encoding <- "tensor"
+kerasConf$model <- "cnn"
+## get the data with the correct encoding
+mnist <- getMnistData(kerasConf)
+## get the model
+cfg <-  getModelConf(kerasConf)
+## max 32 training epochs
+cfg$upper[6] <- 5
+resCnn <- spot(x = NULL,
+            fun = funKerasMnist,
+            lower = cfg$lower,
+            upper = cfg$upper,
+            control = list(funEvals=15,
+                         transformFun = cfg$transformations,
+                         types = cfg$type,
+                         noise = TRUE,
+                         plots = TRUE,
+                         progress = TRUE,
+                         seedFun = 1,
+                         seedSPOT = 1),
+                         kerasConf = kerasConf,
+                         data = mnist)
+}
 }
 
 }

@@ -17,3 +17,10 @@ Parameter values x are transformed to \code{1-10^x}.
 This is helpful for parameters that are likely to be set very close to (but below) a value of 1,
 such as discount factors in reinforcement learning.
 }
+\examples{
+f2 <- function(x){2^x}
+fn <- c("identity", "exp", "f2")
+xNat <- diag(3)
+SPOT::transformX(xNat, fn)
+
+}

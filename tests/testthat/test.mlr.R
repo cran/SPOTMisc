@@ -1,4 +1,5 @@
 context("mlr")
+skip_on_cran()
 
 test_that("test ml config: is the learner correct?", {
   target <- "age"

@@ -3,7 +3,7 @@ skip_on_cran()
 
 test_that("check predDlCensus: test, val, and test data used correctly?", {
   seed <- 1
-  cfg <- getModelConf("dl")
+  cfg <- getModelConf(list(model="dl"))
   x <- matrix(cfg$defaults, nrow=1)
   prop <- 2/3
   nobs <- 1e2

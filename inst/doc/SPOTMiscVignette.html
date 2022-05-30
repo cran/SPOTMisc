@@ -481,7 +481,7 @@ we create a test function with a factor variable:</p>
 <span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>                           <span class="at">progress =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedSPOT =</span> <span class="dv">1</span>),</span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">kConf =</span> kerasConf)</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">kerasConf =</span> kerasConf)</span>
 <span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>res01 <span class="ot">&lt;-</span> res</span>
 <span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="co"># save(res01, file=&quot;exp01.RData&quot;)</span></span></code></pre></div>
 </div>
@@ -519,7 +519,7 @@ we create a test function with a factor variable:</p>
 <span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>                           <span class="at">progress =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedSPOT =</span> <span class="dv">1</span>),</span>
-<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>            <span class="at">kConf =</span> kerasConf)</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>            <span class="at">kerasConf =</span> kerasConf)</span>
 <span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>res02 <span class="ot">&lt;-</span> res</span>
 <span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="co">#save(res02, file=&quot;exp02.RData&quot;)</span></span></code></pre></div>
 </div>
@@ -548,7 +548,7 @@ we create a test function with a factor variable:</p>
 <span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;numeric&quot;</span>)</span>
 <span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="do">### First example: simple function call:</span></span>
 <span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">matrix</span>(lower, <span class="dv">1</span>,)</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="fu">funKerasTransferLearning</span>(x, <span class="at">kConf =</span> kerasConf)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="fu">funKerasTransferLearning</span>(x, <span class="at">kerasConf =</span> kerasConf)</span>
 <span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>kerasConf<span class="sc">$</span>verbose <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">spot</span>(<span class="at">x =</span> <span class="cn">NULL</span>,</span>
 <span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>            <span class="at">fun =</span> funKerasTransferLearning,</span>
@@ -561,7 +561,7 @@ we create a test function with a factor variable:</p>
 <span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>                           <span class="at">progress =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedSPOT =</span> <span class="dv">1</span>),</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>            <span class="at">kConf =</span> kerasConf)</span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>            <span class="at">kerasConf =</span> kerasConf)</span>
 <span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a><span class="co"># save(res, file = &quot;run002.RData&quot;)</span></span></code></pre></div>
 </div>
 </div>
@@ -636,7 +636,7 @@ we create a test function with a factor variable:</p>
 <span id="cb22-65"><a href="#cb22-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb22-66"><a href="#cb22-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span></span>
 <span id="cb22-67"><a href="#cb22-67" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb22-68"><a href="#cb22-68" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb22-68"><a href="#cb22-68" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb22-69"><a href="#cb22-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb22-70"><a href="#cb22-70" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb22-71"><a href="#cb22-71" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist02&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()), <span class="st">&quot;.RData&quot;</span>))</span>
@@ -695,7 +695,7 @@ we create a test function with a factor variable:</p>
 <span id="cb22-124"><a href="#cb22-124" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbosity =</span> <span class="dv">0</span>,</span>
 <span id="cb22-125"><a href="#cb22-125" aria-hidden="true" tabindex="-1"></a>    <span class="at">designControl=</span><span class="fu">list</span>(<span class="at">size=</span>n)</span>
 <span id="cb22-126"><a href="#cb22-126" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb22-127"><a href="#cb22-127" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb22-127"><a href="#cb22-127" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb22-128"><a href="#cb22-128" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb22-129"><a href="#cb22-129" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb22-130"><a href="#cb22-130" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist02Default&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()), <span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
@@ -770,7 +770,7 @@ we create a test function with a factor variable:</p>
 <span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span></span>
 <span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist03&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
@@ -845,7 +845,7 @@ we create a test function with a factor variable:</p>
 <span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb24-67"><a href="#cb24-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span></span>
 <span id="cb24-68"><a href="#cb24-68" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb24-70"><a href="#cb24-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb24-71"><a href="#cb24-71" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb24-72"><a href="#cb24-72" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist07&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
@@ -921,7 +921,7 @@ optimizer</h3>
 <span id="cb25-66"><a href="#cb25-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb25-67"><a href="#cb25-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span></span>
 <span id="cb25-68"><a href="#cb25-68" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb25-69"><a href="#cb25-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb25-69"><a href="#cb25-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb25-70"><a href="#cb25-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb25-71"><a href="#cb25-71" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb25-72"><a href="#cb25-72" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist08&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
@@ -997,7 +997,7 @@ optimizer</h3>
 <span id="cb26-66"><a href="#cb26-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb26-67"><a href="#cb26-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span></span>
 <span id="cb26-68"><a href="#cb26-68" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb26-69"><a href="#cb26-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb26-69"><a href="#cb26-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb26-70"><a href="#cb26-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb26-71"><a href="#cb26-71" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb26-72"><a href="#cb26-72" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist09&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
@@ -1073,7 +1073,7 @@ optimizer</h3>
 <span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span></span>
 <span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist10&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
@@ -1118,7 +1118,7 @@ optimizer</h3>
 <span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedSPOT =</span> <span class="dv">1</span>,</span>
 <span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>                           <span class="at">verbosity =</span> <span class="dv">1</span>), </span>
-<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>                           <span class="at">kConf =</span> kerasConf</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>                           <span class="at">kerasConf =</span> kerasConf</span>
 <span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasTransferLearning04&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
 </div>
@@ -1160,7 +1160,7 @@ optimizer</h3>
 <span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedSPOT =</span> <span class="dv">1</span>,</span>
 <span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>                           <span class="at">verbosity =</span> <span class="dv">1</span>), </span>
-<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>                           <span class="at">kConf =</span> kerasConf</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>                           <span class="at">kerasConf =</span> kerasConf</span>
 <span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasTransferLearning05&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
 </div>
@@ -1206,7 +1206,7 @@ optimizer</h3>
 <span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedFun =</span> <span class="dv">1</span>,</span>
 <span id="cb30-36"><a href="#cb30-36" aria-hidden="true" tabindex="-1"></a>                           <span class="at">seedSPOT =</span> <span class="dv">1</span>,</span>
 <span id="cb30-37"><a href="#cb30-37" aria-hidden="true" tabindex="-1"></a>                           <span class="at">verbosity =</span> <span class="dv">1</span>), </span>
-<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>                           <span class="at">kConf =</span> kerasConf</span>
+<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a>                           <span class="at">kerasConf =</span> kerasConf</span>
 <span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb30-40"><a href="#cb30-40" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasTransferLearning06&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()),<span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>
 <div id="kerasmnist11-02-with-multi-start" class="section level3">
@@ -1280,7 +1280,7 @@ optimizer</h3>
 <span id="cb31-67"><a href="#cb31-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">seedSPOT =</span> <span class="dv">1</span>,</span>
 <span id="cb31-68"><a href="#cb31-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">verbosity=</span><span class="dv">0</span></span>
 <span id="cb31-69"><a href="#cb31-69" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb31-70"><a href="#cb31-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">kConf =</span> kerasConf,</span>
+<span id="cb31-70"><a href="#cb31-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">kerasConf =</span> kerasConf,</span>
 <span id="cb31-71"><a href="#cb31-71" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mnist</span>
 <span id="cb31-72"><a href="#cb31-72" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb31-73"><a href="#cb31-73" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(res, <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resKerasMnist11&quot;</span>, <span class="fu">as.numeric</span>(<span class="fu">Sys.time</span>()), <span class="st">&quot;.RData&quot;</span>))</span></code></pre></div>

@@ -51,6 +51,12 @@ int2fact <- function(x, lvls) {
 #'
 #' @return \code{x}
 #'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("identity", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
+#'
 #' @export
 trans_id <- function(x) {
   x
@@ -69,9 +75,34 @@ trans_id <- function(x) {
 #'
 #' @return \code{x}
 #'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("identity", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
+#'
 #' @export
 trans_mult2_round <- function(x) {
   round(2*x)
+}
+
+#' @title odd transformation
+#' @description Generate odd numbers, i.e., \code{x -> 2x-1} for x > 0.
+#' Return values are rounded using \code{round}.
+#'
+#' @param x input
+#'
+#' @return \code{x}
+#'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("trans_odd_round", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
+#'
+#' @export
+trans_odd_round <- function(x) {
+  round(2*x-1)
 }
 
 #' @title 2 power x transformation
@@ -82,6 +113,12 @@ trans_mult2_round <- function(x) {
 #'
 #' @param x input
 #' @return \code{2^x}
+#'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("identity", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
 #'
 #' @export
 trans_2pow <- function(x) {
@@ -97,6 +134,12 @@ trans_2pow <- function(x) {
 #' @param x input
 #' @return \code{round(2^x)}
 #'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("identity", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
+#'
 #' @export
 trans_2pow_round <- function(x) {
   round(2 ^ x)
@@ -109,6 +152,12 @@ trans_2pow_round <- function(x) {
 #'
 #' @param x input
 #' @return \code{10^x}
+#'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("identity", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
 #'
 #' @export
 trans_10pow <- function(x) {
@@ -125,6 +174,12 @@ trans_10pow <- function(x) {
 #' @param x input
 #' @return \code{1-10^x}
 #'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("identity", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
+#'
 #' @export
 trans_1minus10pow <- function(x) {
   1 - (10 ^ x)
@@ -140,6 +195,12 @@ trans_1minus10pow <- function(x) {
 #'
 #' @param x input
 #' @return \code{round(10^x)}
+#'
+#' @examples
+#' f2 <- function(x){2^x}
+#' fn <- c("identity", "exp", "f2")
+#' xNat <- diag(3)
+#' SPOT::transformX(xNat, fn)
 #'
 #' @export
 trans_10pow_round <- function(x) {

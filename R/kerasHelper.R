@@ -1,67 +1,3 @@
-#' @title Get keras configuration parameter list
-#'
-#' @description Configuration list for \code{keras}'s \code{\link[keras]{fit}} function.
-#'
-#' @details Additional parameters passed to \code{keras}, e.g.,
-#' \describe{
-#'		\item{\code{verbose:}}{Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch). Default: \code{0}.}
-#'		\item{\code{nClasses:}}{Number of classes in (multi-class) classification. Specifies the number of units in the last layer (before softmax).
-#'		Default: \code{1} (binary classification).}
-#'		\item{\code{activation:}}{character. Activation function in the last layer. Default: \code{"sigmoid"}.}
-#'		\item{\code{loss:}}{character. Loss function for compile. Default: \code{"loss_binary_crossentropy"}.}
-#'		\item{\code{metrics:}}{character. Metrics function for compile. Default: \code{"binary_accuracy"}.}
-#'		\item{\code{clearSession:}}{logical. Whether to call \code{\link[keras]{k_clear_session}} or not at the end of keras modelling. Default: \code{FALSE}.}
-#'		\item{\code{resDummy:}}{logical. If \code{TRUE}, generate dummy (mock up) result for testing. If \code{FALSE}, run keras and tf evaluations.
-#'		Default: \code{FALSE}.}
-#'		\item{\code{returnValue:}}{Return value. Can be one of \code{"trainingLoss"}, \code{"negTrainingAccuracy"},
-#'		\code{"validationLoss"}, \code{"negValidationAccuracy"}, \code{"testLoss"}, or \code{"negTestAccuracy"}.
-#'		Or \code{"model"}, i.e., the trained model is returned.
-#'		Default: \code{"validationLoss"}.}
-#'		\item{\code{callbacks:}}{List of callbacks to be called during training. Default: \code{list()}.}
-#'		\item{\code{validation_split:}}{Float between 0 and 1. Fraction of the training data to be
-#'          used as validation data. The model will set apart this fraction of the training data,
-#'          will not train on it, and will evaluate the loss and any model metrics on this data at the end of each epoch.
-#'          The validation data is selected from the last samples in the x and y data provided, before shuffling. Default: \code{0.2}.}
-#'    \item{\code{validation_data (deprecated, see validationData):}}{Data on which to evaluate the loss and any model metrics at the end of each epoch.
-#'     The model will not be trained on this data. This could be a list (x_val, y_val) or a list (x_val, y_val, val_sample_weights).
-#'      validation_data will override validation_split. Default: \code{NULL}.}
-#'    \item{\code{shuffle:}}{Logical (whether to shuffle the training data before each epoch) or string (for "batch").
-#'    "batch" is a special option for dealing with the limitations of HDF5 data; it shuffles in batch-sized chunks.
-#'    Has no effect when steps_per_epoch is not NULL. Default: \code{FALSE}.}
-#'    \item{\code{trainData:}}{Train Data on which to evaluate the loss and any model metrics at the end of each epoch.}
-#'    \item{\code{validationData:}}{Validation Data on which to evaluate the loss and any model metrics at the end of each epoch.}
-#'    \item{\code{testData:}}{Test Data on which to evaluate the loss and any model metrics at the end of the optimization using evaluate().}
-#'    }
-#'
-#' @return kerasConf \code{list} with configuration parameters.
-#'
-#' @seealso \code{\link{evalKerasMnist}}
-#' @seealso \code{\link{funKerasMnist}}
-#' @seealso \code{\link[keras]{fit}}
-#'
-#' @export
-getKerasConf <- function() {
-  kerasConf <- list(
-    verbose = 0,
-    returnValue = "validationLoss",
-    callbacks = list(),
-    validation_split = 0.2,
-    validation_data = NULL,
-    shuffle = FALSE,
-    trainData = NULL,
-    validationData = NULL,
-    testData = NULL,
-    clearSession = FALSE,
-    resDummy = FALSE,
-    nClasses = 1,
-    activation = "sigmoid",
-    loss = "loss_binary_crossentropy",
-    metrics = "binary_accuracy"
-  )
-  return(kerasConf)
-}
-
-
 #' @title Generate result from keras run
 #' @description Compile a matrix with training, validation, and test results
 #' @param kerasConf keras configuration generated with \code{\link{getKerasConf}}
@@ -146,7 +82,8 @@ kerasCompileResult <- function(y, kerasConf) {
       y <- cbind(as.matrix(y[1, 6], 1, 1), y)
       colnames(y) <- c("negTestAccuracy", colNames)
     },{
-      printf("kerasConf$returnValue: %s", kerasConf$returnValue)
+      print(kerasConf$returnValue)
+      #printf("kerasConf$returnValue: %s", kerasConf$returnValue)
       stop("Wrong return value from funKerasMnist()!")
     }
   )
@@ -176,7 +113,7 @@ printf <- function(...){
 #'
 #' @description Generate data for \code{\link{funKerasTransferLearning}}
 #'
-#' @param kConf keras configuration. Default: \code{kConf = \link{getKerasConf}}
+#' @param kerasConf keras configuration. Default: \code{kerasConf = \link{getKerasConf}}
 #'
 #' @details
 #' Standard Data from https://keras.rstudio.com/
@@ -202,7 +139,7 @@ printf <- function(...){
 #' @importFrom tensorflow tf
 #'
 #' @export
-genCatsDogsData <- function(kConf=getKerasConf()) {
+genCatsDogsData <- function(kerasConf=getKerasConf()) {
   trainData <- validationData <- testData <- NULL
   ## Moved to preparations: pip install tensorflow-datasets,
   ## see spotMiscVignette
@@ -215,7 +152,7 @@ genCatsDogsData <- function(kConf=getKerasConf()) {
     split = c("train[:40%]", "train[40%:50%]", "train[50%:60%]"),
     as_supervised = TRUE  # Include labels
   )
-  if(kConf$verbose > 0){
+  if(kerasConf$verbose > 0){
   printf("Number of training samples: %d", length(trainData))
   printf("Number of validation samples: %d", length(validationData))
   printf("Number of test samples: %d", length(testData))

@@ -1,5 +1,4 @@
-#' @title spotPlot
-#'
+#' @title spot plot (generic function)
 #' @description
 #' A wrapper function for available plotting options in SPOT and SPOTMisc.
 #' Plotting functions from SPOT -> plotdata, plotModel, plotFunction.
@@ -405,10 +404,7 @@ plot_parallel <- function(object,
 
 
 #' @title Prepare data for plots
-#'
-#'
-#' @description mlrTools
-#'
+#' @description Data preparation
 #' @param model a function that can be used to build a model based on the data,
 #' e.g. : \code{buildRanger} or \code{buildKriging}. Default is \code{buildRanger}, since it is fast and robust.
 #' @param modelControl a list of control settings for the respective model.
@@ -451,7 +447,6 @@ prepare_data_plot <- function(model=buildRanger,
 }
 
 #' @title Prepare data (results from a tuning run) for plots
-#'
 #' @description
 #' Preparation of the list elements used for plotting.
 #'
@@ -480,8 +475,7 @@ prepare_spot_result_plot <- function(data,model=buildRanger,modelControl=list(),
 
 
 #' @title Sensitivity ggplot of a model
-#'
-#'
+#' @description Generates a sensitivity plot.
 #' @param object the result list returned by
 #' \code{\link[SPOT]{spot}}, importantly including a \code{modelFit}, and the data \code{x}, \code{y}.
 #' @param s number of samples along each dimension.

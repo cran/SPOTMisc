@@ -2,7 +2,7 @@
 % Please edit documentation in R/kerasOptimizer.R
 \name{optimizer_sgd}
 \alias{optimizer_sgd}
-\title{Keras optimizers.}
+\title{Stochastic gradient descent (SGD) optimizer}
 \usage{
 optimizer_sgd(
   learning_rate = 0.01,
@@ -36,18 +36,14 @@ this value.}
 Optimizer for use with \code{\link{compile.keras.engine.training.Model}}.
 }
 \description{
-Based on:
-[keras/R/optimizers.R](https://github.com/rstudio/keras/blob/main/R/optimizers.R)
-}
-\details{
-The following code is commented:
- backcompat_fix_rename_lr_to_learning_rate(...)
-
-
-Stochastic gradient descent optimizer
-
 Stochastic gradient descent optimizer with support for momentum, learning
 rate decay, and Nesterov momentum.
+}
+\details{
+Based on:
+[keras/R/optimizers.R](https://github.com/rstudio/keras/blob/main/R/optimizers.R).
+The following code is commented:
+\code{backcompat_fix_rename_lr_to_learning_rate(...)}
 }
 \note{
 To enable compatibility with the ranges of the learning rates

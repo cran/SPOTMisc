@@ -4,7 +4,7 @@
 \alias{evalKerasMnist}
 \title{evalKerasMnist}
 \usage{
-evalKerasMnist(x, kerasConf = getKerasConf(), data = getMnistData())
+evalKerasMnist(x, kerasConf, data)
 }
 \arguments{
 \item{x}{matrix of hyperparameter values to evaluate with the function.
@@ -39,17 +39,18 @@ if(PYTHON_RETICULATE){
 library("SPOTMisc")
 kerasConf <- getKerasConf()
 kerasConf$verbose <- 1
-lower <- c(1e-6, 1e-6, 16,0.6, 1e-9, 10, 6,0.4,0.99,1,1e-8)
-upper <- c(0.5, 0.5, 512, 1.5, 1e-2, 50, 10,0.999,0.999,10,6e-8)
-types <- c("numeric",  "numeric",  "integer",  "numeric",  "numeric",
-           "integer",  "integer",  "numeric",  "numeric",  "integer",
-           "numeric")
-
-x <- matrix(lower, 1,)
-res <- evalKerasMnist(x, kerasConf)
-str(res)
-### The number of units for all layers can be listed as follows:
-res$modelConf$config$layers[,2]$units
+kerasConf$model <- "dl"
+cfg <-  getModelConf(kerasConf)
+x <- matrix(cfg$default, nrow=1)
+if (length(cfg$transformations) > 0) {  x <- transformX(xNat=x, fn=cfg$transformations)}
+res <- evalKerasMnist(x, kerasConf, data = getMnistData(kerasConf))
+#
+kerasConf$model <- "cnn"
+kerasConf$encoding <- "tensor"
+cfg <-  getModelConf(kerasConf)
+x <- matrix(cfg$default, nrow=1)
+if (length(cfg$transformations) > 0) {  x <- transformX(xNat=x, fn=cfg$transformations)}
+res <- evalKerasMnist(x, kerasConf, data = getMnistData(kerasConf))
 }
 }
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/spotPlot.R
 \name{spotPlot}
 \alias{spotPlot}
-\title{spotPlot}
+\title{spot plot (generic function)}
 \usage{
 spotPlot(plotType, ...)
 }

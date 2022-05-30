@@ -2,7 +2,7 @@
 % Please edit documentation in R/kerasOptimizer.R
 \name{optimizer_adagrad}
 \alias{optimizer_adagrad}
-\title{Adagrad optimizer.}
+\title{Adagrad optimizer}
 \usage{
 optimizer_adagrad(
   learning_rate = 0.01,
@@ -30,8 +30,7 @@ this value.}
 }
 \description{
 Adagrad optimizer as described in [Adaptive Subgradient Methods for Online
-Learning and Stochastic
-Optimization](https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf).
+Learning and Stochastic Optimization](https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf).
 }
 \note{
 To enable compatibility with the ranges of the learning rates

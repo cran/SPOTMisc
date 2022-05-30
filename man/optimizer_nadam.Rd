@@ -41,9 +41,7 @@ Much like Adam is essentially RMSprop with momentum, Nadam is Adam RMSprop
 with Nesterov momentum.
 }
 \details{
-Default parameters follow those provided in the paper. It is
-  recommended to leave the parameters of this optimizer at their default
-  values.
+Default parameters follow those provided in the paper.
 }
 \note{
 To enable compatibility with the ranges of the learning rates

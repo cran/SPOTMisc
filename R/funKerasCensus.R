@@ -60,9 +60,9 @@ predMlCensus <- function(x = NULL,
                        data.seed = data.seed)
     # number of features in task:
     nFeatures <- sum(task$task.desc$n.feat)
-    cfg <- getModelConf(task.type = task.type,
+    cfg <- getModelConf(list(task.type = task.type,
                         model = model,
-                        nFeatures = nFeatures)
+                        nFeatures = nFeatures))
     # Handle dummy
     ## The model is known, so dummy information is available
     if (cfg$dummy) {
@@ -129,7 +129,7 @@ predMlCensus <- function(x = NULL,
 #' ### June 2021. http://arxiv.org/abs/2105.14625.
 #' PYTHON_RETICULATE = FALSE
 #' if(PYTHON_RETICULATE){
-#' cfg <- getModelConf("dl")
+#' cfg <- getModelConf(list(model="dl"))
 #' x <- matrix(cfg$defaults, nrow=1)
 #' res <- predDlCensus(x=x, k=2)
 #' }
@@ -168,8 +168,8 @@ predDlCensus <- function(x = NULL,
 
   kerasConf <- getKerasConf()
   kerasConf$verbose <- verbosity
-  kerasConf$returnValue <- "pred"
-  cfg <- getModelConf("dl")
+  kerasConf$returnObject <- "pred"
+  cfg <- getModelConf(list(model="dl"))
   x <- matrix(x, nrow=1)
   transformFun <- cfg$transformations
   message("predDlCensus(): x before transformX().")
@@ -278,9 +278,9 @@ getMlConfig <- function(target,
   # number of features in task:
   nFeatures <- sum(task$task.desc$n.feat)
 
-  cfg <- getModelConf(task.type = task.type,
+  cfg <- getModelConf(list(task.type = task.type,
                       model = model,
-                      nFeatures = nFeatures)
+                      nFeatures = nFeatures))
   # Handle dummy
   ## The model is known, so dummy information is available
   if (cfg$dummy) {
@@ -302,6 +302,7 @@ getMlConfig <- function(target,
 #'
 #' @param runNr run number (character)
 #' @param model ml/dl model (character)
+#' @param xbest best value, e.g., "xBestOcba" or "xbest"
 #' @param k number of repeats (integer)
 #' @param directory location of the (non-default, e.g., tuned) parameter file
 #' @param target "age" or "income_class"
@@ -315,25 +316,36 @@ getMlConfig <- function(target,
 #' @param verbosity verbosity level (0 or 1)
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' ### These examples require an activated Python environment as described in
+#' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
+#' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
+#' ### June 2021. http://arxiv.org/abs/2105.14625.
+#' PYTHON_RETICULATE = FALSE
+#' if(PYTHON_RETICULATE){
+#' ## The following code was used to evaluate the results in the book
+#' ## "Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide"
+#' ## by Bartz, Bartz-Beielstein, Zaefferer, Mersmann:
+#' ##
 #' modelList <- list("dl", "cvglmnet",  "kknn", "ranger", "rpart" , "svm", "xgboost")
-#' runNr <- list("Default", "00")
-#' directory <- "data"
+#' runNr <- list("100", "Default")
+#' directory <- "../book/data"
 #' for (model in modelList){
-#' for (run in runNr){
-#' score <- evalParamCensus(model = model,
-#'                      runNr = run,
-#'                      prop=2/3,
-#'                      k=2)
+#'   for (run in runNr){    score <- evalParamCensus(model = model,
+#'                                runNr = run,
+#'                                directory = directory,
+#'                                prop=2/3,
+#'                                k=30)
 #' fileName <- paste0(directory, "/", model, run, "Evaluation.RData")
 #' save(score, file = fileName)
+#'  }}
 #' }}
-#' }
 #' @export
 #'
 evalParamCensus <- function(
     runNr = "00",
     model = "dl",
+    xbest = "xBestOcba",
     k = 30,
     directory = "data",
     target = "age",
@@ -383,12 +395,12 @@ evalParamCensus <- function(
   result <- NULL
   ## get hyperparameter config x:
   if (runNr == "Default") {
-    x <- getModelConf(model = model,
+    x <- getModelConf(list(model = model,
                       task.type = task.type,
-                      nFeatures = nFeatures)$defaults
+                      nFeatures = nFeatures))$defaults
   } else{
     load(paste0(directory,"/", model, runNr, ".RData"))
-    x <- result$xbest
+    x <- result[[xbest]]
   }
   x <- matrix(x, nrow = 1, ncol = length(x))
   ## dl evaluation:

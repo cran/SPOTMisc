@@ -64,8 +64,16 @@ getDataCensus <- function(task.type="classif",
                cachedir = cachedir) # default cachedir is only temporary.
 
   ## load CENSUS data
-  dataset <- getOMLDataSet(data.id=4535,
-                           cache.only=cache.only)$data
+
+
+  dataset <- try(
+    getOMLDataSet(data.id=4535,
+                  cache.only=cache.only)$data)
+
+  if(inherits(dataset, "try-error")){
+    dataset <- SPOTMisc::dataCensus
+    message("getOMLDataSet() failed: Using reduced local dataset 'dataCensus' from packae SPOTMisc.")
+    return(dataset)}
 
   if(is.na(cardinality))
     cardinality <- "low"

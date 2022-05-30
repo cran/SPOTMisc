@@ -1,5 +1,69 @@
 # SPOTMisc
 
+## 1.19.26
+* NEWS:
+  * new function trans_odd_round()
+  * evalKerasMnist() checks size (simple check)
+  * new transformations for model "cnn" in getModelConf(): kernel uses trans_odd_round()
+
+## 1.19.24
+* resDl100 data
+
+## 1.19.22
+* NEWS:
+  * getKerasConf() moved to getKerasConf.R
+  * getKerasConf(): new argument tfDevice = "/cpu:0"
+  * getMnistData(), evalKerasGeneric() and funKerasGeneric() require the argument kerasConf (getKerasConf() is not used as the default)
+  * https addresses in documentations use \url{https://....}
+  * funKerasModular.R renamed to funKerasGeneric.R
+
+## 1.19.20
+* NEWS:
+  * getModelConf() arguments modified. Function accepts a list, e.g., from getKerasConf()
+
+## 1.19.18:
+* NEWS:
+  * documentation
+
+## 1.19.16:
+* NEWS
+  * dataCensus: data frame
+  * getDataCensus() uses SPOTMisc data frame "dataCensus" if getDataCensus() fails
+
+## 1.19.14
+* NEWS
+  * spotKeras()
+  
+## 1.19.12
+* NEWS:
+  * pooling modified
+
+## 1.19.10
+* NEWS:
+  * kerasActivation()
+
+## 1.19.8
+* NEWS
+  * hyperparameter handling extended: mapX2Flags() uses new argument "model". Default: "dl"
+
+## 1.19.6
+* NEWS:
+  * limited number of training epochs in startMnistRun.R
+
+## 1.19.4
+* NEWS:
+  * MNIST updated
+  * kConf -> kerasConf
+  * startMnistRun()
+
+## 1.19.2
+* BUGFIX:
+  tryCatch -> try in evalKerasGeneric()
+
+## 1.19.0
+* NEWS:
+  * evalParamCensus() accepts new parameter xbest. Default: "xBestOcba"
+
 ## 1.18.14
 * NEWS:
   * cleanup. funKerasGeneric.R removed

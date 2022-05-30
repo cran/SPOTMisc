@@ -1,16 +1,10 @@
-#' Keras optimizers.
-#'
-#' Based on:
-#' [keras/R/optimizers.R](https://github.com/rstudio/keras/blob/main/R/optimizers.R)
-#'
-#' The following code is commented:
-#'  backcompat_fix_rename_lr_to_learning_rate(...)
-#'
-#'
-#' Stochastic gradient descent optimizer
-#'
-#' Stochastic gradient descent optimizer with support for momentum, learning
+#' @title Stochastic gradient descent (SGD) optimizer
+#' @description Stochastic gradient descent optimizer with support for momentum, learning
 #' rate decay, and Nesterov momentum.
+#' @details Based on:
+#' [keras/R/optimizers.R](https://github.com/rstudio/keras/blob/main/R/optimizers.R).
+#' The following code is commented:
+#' \code{backcompat_fix_rename_lr_to_learning_rate(...)}
 #'
 #' @importFrom keras keras
 #'
@@ -54,7 +48,7 @@ optimizer_sgd <- function(learning_rate = 0.01, momentum = 0.0, decay = 0.0, nes
   do.call(keras$optimizers$SGD, args)
 }
 
-#' RMSProp optimizer
+#' @title RMSProp optimizer
 #'
 #' @importFrom keras keras
 #'
@@ -62,10 +56,7 @@ optimizer_sgd <- function(learning_rate = 0.01, momentum = 0.0, decay = 0.0, nes
 #' @param rho float >= 0. Decay factor.
 #' @param epsilon float >= 0. Fuzz factor. If `NULL`, defaults to `k_epsilon()`.
 #'
-#' @note It is recommended to leave the parameters of this optimizer at their
-#' default values (except the learning rate, which can be freely tuned).
-#'
-#' This optimizer is usually a good choice for recurrent neural networks.
+#' @note This optimizer is usually a good choice for recurrent neural networks.
 #'
 #' @family optimizers
 #'
@@ -90,11 +81,10 @@ optimizer_rmsprop <- function(learning_rate = 0.001, rho = 0.9, epsilon = NULL, 
 }
 
 
-#' Adagrad optimizer.
+#' @title Adagrad optimizer
+#' @description  Adagrad optimizer as described in [Adaptive Subgradient Methods for Online
+#' Learning and Stochastic Optimization](https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf).
 #'
-#' Adagrad optimizer as described in [Adaptive Subgradient Methods for Online
-#' Learning and Stochastic
-#' Optimization](https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf).
 #' @importFrom keras keras
 #' @inheritParams optimizer_rmsprop
 #'
@@ -123,9 +113,8 @@ optimizer_adagrad <- function(learning_rate = 0.01, epsilon = NULL, decay = 0.0,
   do.call(keras$optimizers$Adagrad, args)
 }
 
-#' Adadelta optimizer.
-#'
-#' Adadelta optimizer as described in [ADADELTA: An Adaptive Learning Rate
+#' @title Adadelta optimizer.
+#' @description Adadelta optimizer as described in [ADADELTA: An Adaptive Learning Rate
 #' Method](https://arxiv.org/abs/1212.5701).
 #'
 #' @importFrom keras keras
@@ -163,9 +152,8 @@ optimizer_adadelta <- function(learning_rate = 0, rho = 0.95, epsilon = NULL, de
   do.call(keras$optimizers$Adadelta, args)
 }
 
-#' Adam optimizer
-#'
-#' Adam optimizer as described in [Adam - A Method for Stochastic
+#' @title Adam optimizer
+#' @description  Adam optimizer as described in [Adam - A Method for Stochastic
 #' Optimization](https://arxiv.org/abs/1412.6980v8).
 #' @importFrom keras keras
 #' @inheritParams optimizer_rmsprop
@@ -217,9 +205,8 @@ optimizer_adam <- function(learning_rate = 0.001, beta_1 = 0.9, beta_2 = 0.999, 
 #     **kwargs
 # )
 
-#' Adamax optimizer
-#'
-#' Adamax optimizer from Section 7 of the [Adam paper](https://arxiv.org/abs/1412.6980v8).
+#' @title Adamax optimizer
+#' @description  Adamax optimizer from Section 7 of the [Adam paper](https://arxiv.org/abs/1412.6980v8).
 #' It is a variant of Adam based on the infinity norm.
 #'
 #' @importFrom keras keras
@@ -254,9 +241,8 @@ optimizer_adamax <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999
   do.call(keras$optimizers$Adamax, args)
 }
 
-#' Nesterov Adam optimizer
-#'
-#' Much like Adam is essentially RMSprop with momentum, Nadam is Adam RMSprop
+#' @title Nesterov Adam optimizer
+#' @description Much like Adam is essentially RMSprop with momentum, Nadam is Adam RMSprop
 #' with Nesterov momentum.
 #'
 #' @importFrom keras keras
@@ -265,9 +251,7 @@ optimizer_adamax <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999
 #' @inheritParams optimizer_adam
 #' @param schedule_decay Schedule deacy.
 #'
-#' @details Default parameters follow those provided in the paper. It is
-#'   recommended to leave the parameters of this optimizer at their default
-#'   values.
+#' @details Default parameters follow those provided in the paper.
 #'
 #' @note To enable compatibility with the ranges of the learning rates
 #' of the other optimizers, the learning rate \code{learning_rate}
@@ -319,8 +303,10 @@ optimizer_nadam <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999,
 # }
 
 #' @title Select keras optimizer
+#' @description Select one of the following optimizers:
+#' "SDG", "RMSPROP", "ADAGRAD", "ADADELTA", "ADAM", "ADAMAX", "NADAM".
 #'
-#' @param name integer specifying the algorithm. Can be one of the following:
+#' @param optimizer integer specifying the algorithm. Can be one of the following:
 #' \code{1=SDG}, \code{2=RMSPROP}, \code{3=ADAGRAD}, \code{4=ADADELTA},
 #' \code{5=ADAM}, \code{6=ADAMAX}, or \code{7=NADAM}.
 #'
@@ -352,7 +338,7 @@ optimizer_nadam <- function(learning_rate = 0.002, beta_1 = 0.9, beta_2 = 0.999,
 #'
 #' @export
 #'
-selectKerasOptimizer <- function(name,
+selectKerasOptimizer <- function(optimizer,
                                  learning_rate = 0.01,
                                  momentum = 0.0,
                                  decay = 0.0,
@@ -365,13 +351,13 @@ selectKerasOptimizer <- function(name,
                                  beta_2 = 0.999,
                                  amsgrad = FALSE,
                                  ...){
-  names <- list("SDG", "RMSPROP", "ADAGRAD", "ADADELTA",
+  optimizers <- list("SDG", "RMSPROP", "ADAGRAD", "ADADELTA",
     "ADAM", "ADAMAX", "NADAM")
   # FIXME: remove after testing:
   message("selectKerasOptimizer using optimizer:")
-  print(names[[name]])
+  print(optimizers[[optimizer]])
 
-  switch(names[[name]],
+  switch(optimizers[[optimizer]],
          SDG = {optimizer_sgd(learning_rate = learning_rate,
                             momentum = 0.0,
                             decay = 0.0,

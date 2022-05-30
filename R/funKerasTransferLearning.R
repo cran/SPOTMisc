@@ -265,8 +265,8 @@ evalKerasTransferLearning <- function(x,
 #'
 #' @param x matrix of hyperparameter values to evaluate with the function.
 #' Rows for points and columns for dimension.
-#' @param kConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
-#' Default: \code{kConf = getKerasConf()}.
+#' @param kerasConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
+#' Default: \code{kerasConf = getKerasConf()}.
 #' @param data data
 #'
 #' @seealso \code{\link{getKerasConf}}
@@ -332,7 +332,7 @@ evalKerasTransferLearning <- function(x,
 #'                            progress = TRUE,
 #'                            seedFun = 1,
 #'                            seedSPOT = 1,
-#'                            kConf = kerasConf)
+#'                            kerasConf = kerasConf)
 #'                            )
 #'  save(res, file = paste0("resKerasTransferLearning", as.numeric(Sys.time()),".RData"))
 #'
@@ -371,7 +371,7 @@ evalKerasTransferLearning <- function(x,
 #'                            progress = TRUE,
 #'                            seedFun = 1,
 #'                            seedSPOT = 1,
-#'                            kConf = kerasConf))
+#'                            kerasConf = kerasConf))
 #' save(res,file = paste0("resKerasTransferLearningValidationLoss04",
 #' as.numeric(Sys.time()),".RData"))
 #'
@@ -412,7 +412,7 @@ evalKerasTransferLearning <- function(x,
 #'                            progress = TRUE,
 #'                            seedFun = 1,
 #'                            seedSPOT = 1,
-#'                            kConf = kerasConf))
+#'                            kerasConf = kerasConf))
 #' save(res,file = paste0("resKerasTransferLearningNegValidationAccuracy05",
 #' as.numeric(Sys.time()),".RData"))
 #'
@@ -453,7 +453,7 @@ evalKerasTransferLearning <- function(x,
 #'                            progress = TRUE,
 #'                            seedFun = 1,
 #'                            seedSPOT = 1,
-#'                            kConf = kerasConf)
+#'                            kerasConf = kerasConf)
 #' )
 #' save(res, file = paste0("resKerasTransferLearningTrainingLoss06",
 #' as.numeric(Sys.time()),".RData"))
@@ -462,7 +462,7 @@ evalKerasTransferLearning <- function(x,
 #'
 #' @export
 funKerasTransferLearning <- function (x,
-                                      kConf = getKerasConf(),
+                                      kerasConf = getKerasConf(),
                                       data = NULL) {
   score <- NULL
   y <- matrix(apply(
@@ -472,7 +472,7 @@ funKerasTransferLearning <- function (x,
     # margin (apply over rows)
     evalKerasTransferLearning,
     # function
-    kerasConf = kConf,
+    kerasConf = kerasConf,
     data = data
   ),
   nrow = nrow(x),

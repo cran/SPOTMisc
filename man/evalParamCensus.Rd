@@ -7,6 +7,7 @@
 evalParamCensus(
   runNr = "00",
   model = "dl",
+  xbest = "xBestOcba",
   k = 30,
   directory = "data",
   target = "age",
@@ -24,6 +25,8 @@ evalParamCensus(
 \item{runNr}{run number (character)}
 
 \item{model}{ml/dl model (character)}
+
+\item{xbest}{best value, e.g., "xBestOcba" or "xbest"}
 
 \item{k}{number of repeats (integer)}
 
@@ -51,18 +54,28 @@ evalParamCensus(
 evaluate hyperparameter config on census data
 }
 \examples{
-\dontrun{
+\donttest{
+### These examples require an activated Python environment as described in
+### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
+### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
+### June 2021. http://arxiv.org/abs/2105.14625.
+PYTHON_RETICULATE = FALSE
+if(PYTHON_RETICULATE){
+## The following code was used to evaluate the results in the book
+## "Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide"
+## by Bartz, Bartz-Beielstein, Zaefferer, Mersmann:
+##
 modelList <- list("dl", "cvglmnet",  "kknn", "ranger", "rpart" , "svm", "xgboost")
-runNr <- list("Default", "00")
-directory <- "data"
+runNr <- list("100", "Default")
+directory <- "../book/data"
 for (model in modelList){
-for (run in runNr){
-score <- evalParamCensus(model = model,
-                     runNr = run,
-                     prop=2/3,
-                     k=2)
+  for (run in runNr){    score <- evalParamCensus(model = model,
+                               runNr = run,
+                               directory = directory,
+                               prop=2/3,
+                               k=30)
 fileName <- paste0(directory, "/", model, run, "Evaluation.RData")
 save(score, file = fileName)
+ }}
 }}
-}
 }

@@ -17,3 +17,10 @@ Parameter values can be translated,
 e.g., to base 10 as implemented in \code{\link{trans_10pow}}.
 \code{trans_10pow_round} implements the transformation x -> round(2^x).
 }
+\examples{
+f2 <- function(x){2^x}
+fn <- c("identity", "exp", "f2")
+xNat <- diag(3)
+SPOT::transformX(xNat, fn)
+
+}

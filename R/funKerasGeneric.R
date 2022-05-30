@@ -1,16 +1,13 @@
 #' @title evalKerasGeneric model building and compile
-#'
 #' @description Hyperparameter Tuning: Keras Generic Classification Function.
-#'
 #' @details Trains a simple deep NN on a generic data set.
-#' Standard Code from https://keras.rstudio.com/
-#' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
-#'
+#' Standard Code from \url{https://keras.rstudio.com/}.
+#' Modified by T. Bartz-Beielstein.
 #' @param x matrix of transformed hyperparameter values to evaluate with the function.
 #' If \code{NULL}, a simple keras model will be build, which is considered default
 #' (see \code{\link{getSimpleKerasModel}}).
-#' @param kerasConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
-#' Default: \code{kerasConf = getKerasConf()}.
+#' @param kerasConf List of additional parameters passed to keras as described in
+#' \code{\link{getKerasConf}}. If no value is specified, stop() is called.
 #' @param specList prepared data. See \code{\link{genericDataPrep}}.
 #' See \code{\link{getGenericTrainValTestData}}.
 #'
@@ -27,65 +24,59 @@
 #' @importFrom tfdatasets dense_features
 #' @importFrom tfdatasets dataset_use_spec
 #' @importFrom reticulate import
+#' @importFrom SPOT vmessage
 #' @export
-evalKerasGeneric <-  function(x=NULL,
-                                kerasConf = getKerasConf(),
-                                specList = NULL) {
+evalKerasGeneric <-  function(x = NULL,
+                              kerasConf = NULL,
+                              specList = NULL) {
+  if (is.null(kerasConf)) {
+    stop("evalKerasGeneric(): argument kerasConf is missing")
+  }
   os <- reticulate::import("os")
   tf <- reticulate::import("tensorflow")
   tf$get_logger()$setLevel('ERROR')
   if (kerasConf$resDummy)
   {
-       y <- kerasReturnDummy(kerasConf = kerasConf)
-       y <- kerasCompileResult(y = y,
-                               kerasConf = kerasConf)
-       message("evalKerasGeneric(): Returning dummy value for testing.")
+    y <- kerasReturnDummy(kerasConf = kerasConf)
+    y <- kerasCompileResult(y = y,
+                            kerasConf = kerasConf)
+    message("evalKerasGeneric(): Returning dummy value for testing.")
     return(y)
   } else if (is.null(x))
   {
     model <- getSimpleKerasModel(specList = specList,
-                             kerasConf = kerasConf)
-    FLAGS <- list(epochs=16)
-   } else{
-     ## map numeric x hyperparameters to FLAGS:
-     FLAGS <- mapX2FLAGS(x)
-    model <- kerasBuildCompile(FLAGS=FLAGS,
-                       kerasConf = kerasConf,
-                       specList = specList)
-   }
-  y <- tryCatch(
-    {kerasFit(model=model,
-             specList = specList,
-            FLAGS = FLAGS,
-             kerasConf = kerasConf)
-    },
-    error=function(cond) {
-      message("Calling kerasFit() from evalKerasGeneric() failed.")
-      message("Original error message:")
-      message(cond)
-      # Return value in case of error
-      return(NULL)
-    }
-  )
-  # if(is.na(y)){
-  #   if(is.null(x)) n <- 1 else n <- nrow(x)
-  #   return(matrix(rep(NA,7*n),nrow= n))
-    if(is.null(y)){
-      y <- matrix(rep(NA,6),nrow=1)
-      y <- kerasCompileResult(y = y,
-                              kerasConf = kerasConf)
-      message("evalKerasGeneric(): Returning NAs.")
-      return(y)
+                                 kerasConf = kerasConf)
+    FLAGS <- list(epochs = 16)
+  } else{
+    ## map numeric x hyperparameters to FLAGS:
+    FLAGS <- mapX2FLAGS(x, model = "dl")
+    model <- kerasBuildCompile(FLAGS = FLAGS,
+                               kerasConf = kerasConf,
+                               specList = specList)
+  }
+  y <- try(kerasFit(
+    model = model,
+    specList = specList,
+    FLAGS = FLAGS,
+    kerasConf = kerasConf
+  ))
+
+  if (inherits(y, "try-error")) {
+    y <- matrix(rep(NA, 6), nrow = 1)
+    y <- kerasCompileResult(y = y,
+                            kerasConf = kerasConf)
+    message("evalKerasGeneric(): Returning NAs.")
+    return(y)
   }
 
   model <- y$model
   history <- y$history
-  if (kerasConf$returnValue == "model") {
+  if (kerasConf$returnObject == "model") {
     return(model)
   }
   # evaluate on test data
   pred <- predict(model, specList$testGeneric)
-  if (kerasConf$returnValue == "pred") {
+  if (kerasConf$returnObject == "pred") {
     if (kerasConf$clearSession) {
       keras::k_clear_session()
     }
@@ -98,10 +89,11 @@ evalKerasGeneric <-  function(x=NULL,
   #     specList$test_ds_generic %>% dataset_use_spec(specList$specGeneric_prep),
   #     verbose = kerasConf$verbose
   #   )
-  testScore <- keras::evaluate(model,
-      dataset_use_spec(specList$test_ds_generic, specList$specGeneric_prep),
-      verbose = kerasConf$verbose
-    )
+  testScore <- keras::evaluate(
+    model,
+    dataset_use_spec(specList$test_ds_generic, specList$specGeneric_prep),
+    verbose = kerasConf$verbose
+  )
   y <- kerasEvalPrediction(
     pred = pred,
     testScore = testScore,
@@ -109,12 +101,8 @@ evalKerasGeneric <-  function(x=NULL,
     metrics = history$metrics,
     kerasConf = kerasConf
   )
-  if (kerasConf$verbose > 0) {
-    message("funKerasGeneric: evaluation on test data with keras::evaluate()")
-    print(testScore)
-    message("funKerasGeneric: evaluation with Metrics::logLoss/accuracy()")
-    print(y)
-  }
+  vmessage(kerasConf$verbose, "funKerasGeneric: evaluation on test data with keras::evaluate()", testScore)
+  vmessage(kerasConf$verbose, "funKerasGeneric: evaluation with Metrics::logLoss/accuracy()", y)
   if (kerasConf$clearSession) {
     k_clear_session()
   }
@@ -126,7 +114,7 @@ evalKerasGeneric <-  function(x=NULL,
 #' @description Hyperparameter Tuning: Keras Generic Classification Function.
 #'
 #' @details Trains a simple deep NN on a generic data set.
-#' Standard Code from https://keras.rstudio.com/
+#' Standard Code from \url{https://keras.rstudio.com/}
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @param FLAGS flags. list of hyperparameter values.
@@ -161,19 +149,19 @@ evalKerasGeneric <-  function(x=NULL,
 #'
 #' @export
 kerasBuildCompile <-  function(FLAGS,
-                             kerasConf,
-                             specList) {
+                               kerasConf,
+                               specList) {
   os <- reticulate::import("os")
   tf <- reticulate::import("tensorflow")
   tf$get_logger()$setLevel('ERROR')
   # Complex model with variable number of layers:
-    # 1st hidden layer with input shape:
-    # Instantiate the base model (or "template" model).
-    # We recommend doing this with under a CPU device scope,
-    # so that the model's weights are hosted on CPU memory.
-    # Otherwise they may end up hosted on a GPU, which would
-    # complicate weight sharing.
-    with(tf$device("/cpu:0"), {
+  # 1st hidden layer with input shape:
+  # Instantiate the base model (or "template" model).
+  # We recommend doing this with under a CPU device scope,
+  # so that the model's weights are hosted on CPU memory.
+  # Otherwise they may end up hosted on a GPU, which would
+  # complicate weight sharing.
+  with(tf$device("/cpu:0"), {
     model <- keras_model_sequential() %>%
       layer_dense_features(dense_features(specList$specGeneric_prep)) %>%
       layer_dense(units = FLAGS$units, activation = "relu")
@@ -196,12 +184,17 @@ kerasBuildCompile <-  function(FLAGS,
     }
     ## Adding the final layer with nClasses units, where each unit represents one class
     ## in  multi-class classification and sigmoid/softmax (nClasses == 1 for binary classification)
-    model %>% layer_dense(units = kerasConf$nClasses, activation = kerasConf$activation)
+    model %>% layer_dense(units = kerasConf$nClasses,
+                          activation = kerasConf$activation)
     ## Model building is done
+    if (kerasConf$loss == "loss_binary_crossentropy") {
+      kerasConf$loss <- rlang::sym(kerasConf$loss)
+    }
     model %>% compile(
-      loss = rlang::sym(kerasConf$loss),
+      #loss = rlang::sym(kerasConf$loss),
+      loss = kerasConf$loss,
       optimizer = selectKerasOptimizer(
-        FLAGS$name,
+        FLAGS$optimizer,
         learning_rate = FLAGS$learning_rate,
         momentum = 0.0,
         decay = 0.0,
@@ -217,8 +210,8 @@ kerasBuildCompile <-  function(FLAGS,
       ,
       metrics = kerasConf$metrics
     )
-    }) # end with
-    return(model)
+  }) # end with
+  return(model)
 }
 
 #' @title kerasFit fit
@@ -226,7 +219,7 @@ kerasBuildCompile <-  function(FLAGS,
 #' @description Hyperparameter Tuning: Keras Generic Classification Function.
 #'
 #' @details Trains a simple deep NN on a generic data set.
-#' Standard Code from https://keras.rstudio.com/
+#' Standard Code from \url{https://keras.rstudio.com/}
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @param model model
@@ -251,32 +244,30 @@ kerasBuildCompile <-  function(FLAGS,
 kerasFit <- function(model,
                      specList,
                      FLAGS,
-                     kerasConf){
+                     kerasConf) {
   os <- reticulate::import("os")
   tf <- reticulate::import("tensorflow")
   tf$get_logger()$setLevel('ERROR')
 
-  with(tf$device("/cpu:0"), {
-  # Training & Evaluation
+  with(tf$device(kerasConf$tfDevice), {
+    # Training & Evaluation
     history <- model %>% fit(
       dataset_use_spec(specList$train_ds_generic,
                        spec = specList$specGeneric_prep),
       epochs = FLAGS$epochs,
-      validation_data = dataset_use_spec(
-        specList$val_ds_generic,
-        specList$specGeneric_prep
-      ),
+      validation_data = dataset_use_spec(specList$val_ds_generic,
+                                         specList$specGeneric_prep),
       verbose = kerasConf$verbose
     )
-    }) # end with
+  }) # end with
   ## model building, compilation, and fitting completed
   if (kerasConf$verbose > 0) {
-    printFLAGS(FLAGS)
+    #printFLAGS(FLAGS)
     print(model)
     print(history$metrics)
     plot(history)
   }
-  return(list(model=model, history=history))
+  return(list(model = model, history = history))
 }
 
 #' @title funKerasGeneric
@@ -285,7 +276,7 @@ kerasFit <- function(model,
 #'
 #' @details Trains a simple deep NN on arbitrary data sets.
 #' Provides a template that can be used for other networks as well.
-#' Standard Code from https://keras.rstudio.com/
+#' Standard Code from \url{https://keras.rstudio.com/}
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' Note: The WARNING "tensorflow:Layers in a Sequential model should only have a single input tensor.
@@ -293,12 +284,12 @@ kerasFit <- function(model,
 #'      can be safely ignored:
 #'      in general, Keras encourages its users to use functional models
 #'      for multi-input layers, but there is nothing wrong with doing so.
-#'      See: https://github.com/tensorflow/recommenders/issues/188
+#'      See: \url{https://github.com/tensorflow/recommenders/issues/188}.
 #'
 #' @param x matrix of hyperparameter values to evaluate with the function.
 #' Rows for points and columns for dimension.
 #' @param kerasConf List of additional parameters passed to keras as described in \code{\link{getKerasConf}}.
-#' Default: \code{kerasConf = getKerasConf()}.
+#' Default: \code{NULL}.
 #' @param specList prepared data. See \code{\link{genericDataPrep}}.
 #' @seealso \code{\link{getKerasConf}}
 #' @seealso \code{\link{evalKerasGeneric}}
@@ -333,7 +324,7 @@ kerasFit <- function(model,
 #' specList <- genericDataPrep(data=data, batch_size = batch_size)
 #'
 #' ## model configuration:
-#' cfg <-  getModelConf("dl")
+#' cfg <-  getModelConf(list(model="dl"))
 #' x <- matrix(cfg$default, nrow=1)
 #' transformFun <- cfg$transformations
 #' types <- cfg$type
@@ -375,8 +366,11 @@ kerasFit <- function(model,
 #'
 #' @export
 funKerasGeneric <-  function (x,
-                             kerasConf = getKerasConf(),
-                             specList = NULL) {
+                              kerasConf = NULL,
+                              specList = NULL) {
+  if (is.null(kerasConf)) {
+    stop("funKerasGeneric(): argument kerasConf is missing")
+  }
   y <- matrix(
     apply(
       X = x,
@@ -415,6 +409,12 @@ funKerasGeneric <-  function (x,
 #'
 #' @examples
 #' \donttest{
+#' ### These examples require an activated Python environment as described in
+#' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
+#' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
+#' ### June 2021. http://arxiv.org/abs/2105.14625.
+#' PYTHON_RETICULATE = FALSE
+#' if(PYTHON_RETICULATE){
 #' target <- "age"
 #' batch_size <- 32
 #' prop <- 2/3
@@ -430,6 +430,7 @@ funKerasGeneric <-  function (x,
 #'   reticulate::as_iterator() %>%
 #'    reticulate::iter_next()
 #' }
+#' }
 #'
 #' @returns a fitted \code{FeatureSpec} object and the hold-out testGeneric (=data$testGeneric).
 #' This is returned as the follwoing list.
@@ -442,7 +443,7 @@ funKerasGeneric <-  function (x,
 #' }
 #' @export
 genericDataPrep <- function(data,
-                           batch_size = 32) {
+                            batch_size = 32) {
   train_ds_generic <- val_ds_generic <- test_ds_generic <- NULL
 
   df_to_dataset <- function(df,
@@ -464,7 +465,9 @@ genericDataPrep <- function(data,
     df_to_dataset(data$valGeneric, shuffle = FALSE, batch_size = batch_size)
   # test data is not used. Generated for the final evaluation.
   test_ds_generic <-
-    df_to_dataset(data$testGeneric, shuffle = FALSE, batch_size = batch_size)
+    df_to_dataset(data$testGeneric,
+                  shuffle = FALSE,
+                  batch_size = batch_size)
 
   # train_ds_generic %>%
   #   reticulate::as_iterator() %>%
@@ -496,96 +499,6 @@ genericDataPrep <- function(data,
 
 
 
-#' @title Map x parameters to a list of named values
-#'
-#' @param x input values (11 dim).
-#' \describe{
-#'		\item{\code{x[1]: dropout}}{dropout rate first layer.}
-#'		\item{\code{x[2]: dropoutfac}}{dropout factor (multiplier).}
-#'		\item{\code{x[3]: units}}{number of units in the first layer.}
-#'		\item{\code{x[4]: unitsfact}}{units factor (multiplier).}
-#'		\item{\code{x[5]: learning_rate}}{learning rate for optimizer. See, e.g.: \code{link{optimizer_sgd}}}
-#'		\item{\code{x[6]: epochs}}{number of training epochs.}
-#'		\item{\code{x[7]: beta_1}}{The exponential decay rate for the 1st moment estimates. float, 0 < beta < 1. Generally close to 1.}
-#'		\item{\code{x[8]: beta_2}}{The exponential decay rate for the 2nd moment estimates. float, 0 < beta < 1. Generally close to 1.}
-#'		\item{\code{x[9]: layers}}{number of layers.}
-#'  	\item{\code{x[10]: epsilon}}{float >= 0. Fuzz factor. If NULL, defaults to k_epsilon().}
-#'  	\item{\code{x[11]: name}}{integer. Specifies optimizer.}
-#' }
-#'
-#' @returns FLAGS named list (parameter names as specified above):
-#'   dropout, dropoutfac, units, unitsfact, learning_rate,
-#'   epochs, beta_1, beta_2, layers, epsilon, name)
-#'
-#' @export
-mapX2FLAGS <- function(x) {
-  if (!is.null(x)) {
-    FLAGS <- list(
-      "dropout" =  x[1],
-      "dropoutfact" =  x[2],
-      "units" = x[3],
-      "unitsfact" = x[4],
-      "learning_rate" =  x[5],
-      "epochs" = x[6],
-      "beta_1" =  x[7],
-      "beta_2" =  x[8],
-      "layers" =  x[9],
-      "epsilon" = x[10],
-      "name" = x[11]
-    )
-  } else {
-    FLAGS <- NULL
-  }
-  return(FLAGS)
-}
-
-
-#' @title Print parameter values from FLAG list
-#'
-#' @description Print values of the following hyperparmeters:
-#' \describe{
-#'		\item{\code{x[1]: dropout}}{dropout rate first layer.}
-#'		\item{\code{x[2]: dropoutfac}}{dropout factor (multiplier).}
-#'		\item{\code{x[3]: units}}{number of units in the first layer.}
-#'		\item{\code{x[4]: unitsfact}}{units factor (multiplier).}
-#'		\item{\code{x[5]: learning_rate}}{learning rate for optimizer. See, e.g.: \code{link{optimizer_sgd}}}
-#'		\item{\code{x[6]: epochs}}{number of training epochs.}
-#'		\item{\code{x[7]: beta_1}}{The exponential decay rate for the 1st moment estimates. float, 0 < beta < 1. Generally close to 1.}
-#'		\item{\code{x[8]: beta_2}}{The exponential decay rate for the 2nd moment estimates. float, 0 < beta < 1. Generally close to 1.}
-#'		\item{\code{x[9]: layers}}{number of layers.}
-#'  	\item{\code{x[10]: epsilon}}{float >= 0. Fuzz factor. If NULL, defaults to k_epsilon().}
-#'  	\item{\code{x[11]: name}}{integer. Specifies optimizer.}
-#' }
-#'
-#' @param FLAGS list of parameters, see \code{\link{mapX2FLAGS}}
-#'
-#' @export
-printFLAGS <- function(FLAGS) {
-  if (!is.null(FLAGS)) {
-    printf("dropout: %f", FLAGS$dropout)
-    printf("dropoutfac: %f", FLAGS$dropoutfac)
-    printf("units: %1.0f", FLAGS$units)
-    printf("unitsfac: %f", FLAGS$unitsfact)
-    printf("learning_rate: %f", FLAGS$learning_rate)
-    printf("epochs: %1.0f", FLAGS$epochs)
-    printf("beta_1: %f", FLAGS$beta_1)
-    printf("beta_2: %f", FLAGS$beta_2)
-    printf("layers: %1.0f", FLAGS$layers)
-    printf("epsilon: %f", FLAGS$epsilon)
-    if (FLAGS$layers > 1) {
-      for (i in 2:FLAGS$layers) {
-        FLAGS$dropout <- FLAGS$dropout * FLAGS$dropoutfact
-        FLAGS$units <-
-          max(as.integer(FLAGS$units * FLAGS$unitsfact), 1)
-        printf("Dropout rate %f in layer %1.0f", FLAGS$dropout, i)
-        printf("Units %1.0f in layer %1.0f", FLAGS$units, i)
-      }
-    }
-    printf("name: %1.0f", FLAGS$name)
-  }
-}
-
-
 #' @title Return dummy values
 #'
 #' @param kerasConf keras configuration list
@@ -598,11 +511,9 @@ printFLAGS <- function(FLAGS) {
 #' @export
 kerasReturnDummy <- function(kerasConf) {
   n <- 6 # dim of y (return) values
-  y <- matrix(
-    runif(n),
-    nrow = 1,
-    ncol = n
-  )
+  y <- matrix(runif(n),
+              nrow = 1,
+              ncol = n)
   return(y)
 }
 
@@ -630,6 +541,12 @@ kerasReturnDummy <- function(kerasConf) {
 #'
 #' @examples
 #' \donttest{
+#' ### These examples require an activated Python environment as described in
+#' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
+#' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
+#' ### June 2021. http://arxiv.org/abs/2105.14625.
+#' PYTHON_RETICULATE = FALSE
+#' if(PYTHON_RETICULATE){
 #' target <- "age"
 #' nobs <- 1000
 #' batch_size <- 32
@@ -643,19 +560,23 @@ kerasReturnDummy <- function(kerasConf) {
 #' simpleModel <- getSimpleKerasModel(specList = specList,
 #'                kerasConf = kerasConf)
 #' }
+#' }
 #' @export
 #'
 getSimpleKerasModel <- function(specList,
                                 kerasConf = getKerasConf()) {
   message("getSimpleKerasModel")
   with(tf$device("/cpu:0"), {
-  model <- keras_model_sequential() %>%
-    layer_dense_features(dense_features(specList$specGeneric_prep)) %>%
-    layer_dense(units = 32, activation = "relu") %>%
-    layer_dense(units = kerasConf$nClasses, activation = kerasConf$activation)
-  model %>% compile(loss = sym(kerasConf$loss),
-                    optimizer = "adam",
-                    metrics = kerasConf$metrics)
+    model <- keras_model_sequential() %>%
+      layer_dense_features(dense_features(specList$specGeneric_prep)) %>%
+      layer_dense(units = 32, activation = "relu") %>%
+      layer_dense(units = kerasConf$nClasses,
+                  activation = kerasConf$activation)
+    model %>% compile(
+      loss = sym(kerasConf$loss),
+      optimizer = "adam",
+      metrics = kerasConf$metrics
+    )
   }) ## end with
   return(model)
 }
@@ -725,7 +646,7 @@ getSimpleKerasModel <- function(specList,
 #' }
 #' @export
 kerasEvalPrediction <- function(pred,
-                                testScore = c(NA,NA),
+                                testScore = c(NA, NA),
                                 specList,
                                 metrics,
                                 kerasConf) {
@@ -743,14 +664,13 @@ kerasEvalPrediction <- function(pred,
   # validationLoss,  negValidationAccuracy,
   # testLoss,  negTestAccuracy:
   y <- matrix(
-    c(
-      metrics$loss[length(metrics$loss)],
-      -metrics$binary_accuracy[length(metrics$binary_accuracy)],
-      metrics$val_loss[length(metrics$val_loss)],
-      -metrics$val_binary_accuracy[length(metrics$val_binary_accuracy)],
-      score[[1]],
-      -score[[2]]
-    ),
+    c(# metrics$loss[length(metrics$loss)],
+      # -metrics$binary_accuracy[length(metrics$binary_accuracy)],
+      # metrics$val_loss[length(metrics$val_loss)],
+      # -metrics$val_binary_accuracy[length(metrics$val_binary_accuracy)],
+      metrics[[1]][length(metrics[[1]])],-metrics[[2]][length(metrics[[2]])],
+      metrics[[3]][length(metrics[[3]])],-metrics[[4]][length(metrics[[4]])],
+      score[[1]],-score[[2]]),
     nrow = 1,
     ncol = 6
   )
@@ -772,7 +692,8 @@ kerasEvalPrediction <- function(pred,
 #'
 #' @param modelList ml/dl model (character)
 #' @param runNr run number (character)
-#' @param directory location of the (non-default, e.g., tuned) parameter file
+#' @param directory location of the (non-default, e.g., tuned) parameter file. Note:
+#' load result only when directory is specified, otherwise use (only one!) result from the workspace.
 #' @param maxY max number of y values. If \code{NULL} then all y values are used.
 #' @returns data frame with results:
 #' \describe{
@@ -785,9 +706,10 @@ kerasEvalPrediction <- function(pred,
 #' }
 #' @examples
 #' \donttest{
-#' modelList <- list("dl")
-#' runNr <- list("28")
-#' directory <- "../book/data"
+#' modelList <- list("resDl")
+#' runNr <- list("100")
+#' result <- resDl100
+#' directory <- NULL
 #' prepareProgressPlot(modelList,
 #'                     runNr,
 #'                     directory)
@@ -796,32 +718,46 @@ kerasEvalPrediction <- function(pred,
 #'
 prepareProgressPlot <- function(modelList,
                                 runNr,
-                                directory,
-                                maxY = NULL){
-  result <- NULL
-  dfRun <- data.frame(x=NULL, y=NULL, name=NULL, size=NULL, yInitMin=NULL)
-  attr(dfRun,"yInitmin") <- NULL
+                                directory = NULL,
+                                maxY = NULL) {
+  dfRun <-
+    data.frame(
+      x = NULL,
+      y = NULL,
+      name = NULL,
+      size = NULL,
+      yInitMin = NULL
+    )
+  attr(dfRun, "yInitmin") <- NULL
   for (model in modelList) {
-    for (run in runNr){
-    fileName <- paste0(directory, "/", model, run, ".RData")
-    load(fileName)
-    if(is.null(maxY)){
-      maxY <- length(result$y)
-    }
-    maxY <- min(maxY, length(result$y))
-    result$y <- result$y[1:maxY,1]
-    ## FIXME: add information about initial number of replicates (Rinit):
-    size <- result$control$designControl$size
-    dfRun <- rbind(dfRun,
-                   data.frame(x = 1:maxY,
-                              y = result$y,
-                              name=model,
-                              size = size,
-                              yInitMin= min(result$y[1:size])))
-    attr(dfRun,"yInitmin") <- c(attr(dfRun, which = "yInitmin"), min(result$y[1:size]))
+    for (run in runNr) {
+      ## load result only when directory is specified,
+      ## otherwise use (only one!) result from the workspace.
+      if(!is.null(directory)){
+        result <- NULL
+      fileName <- paste0(directory, "/", model, run, ".RData")
+      load(fileName)
+      }
+      if (is.null(maxY)) {
+        maxY <- length(result$y)
+      }
+      maxY <- min(maxY, length(result$y))
+      result$y <- result$y[1:maxY, 1]
+      ## FIXME: add information about initial number of replicates (Rinit):
+      size <- result$control$designControl$size
+      dfRun <- rbind(dfRun,
+                     data.frame(
+                       x = 1:maxY,
+                       y = result$y,
+                       name = model,
+                       size = size,
+                       yInitMin = min(result$y[1:size])
+                     ))
+      attr(dfRun, "yInitmin") <-
+        c(attr(dfRun, which = "yInitmin"), min(result$y[1:size]))
     }
   }
-  attr(dfRun,"ymin") <- min(dfRun$y)
+  attr(dfRun, "ymin") <- min(dfRun$y)
   return(dfRun)
 }
 
@@ -878,10 +814,10 @@ prepareProgressPlot <- function(modelList,
 #' }
 #' @export
 getGenericTrainValTestData <- function(dfGeneric = NULL,
-                                      prop = 0.5) {
+                                       prop = 0.5) {
   # Handle split proportions
-  if(length(prop)==1){
-    prop <- rep(prop,2)
+  if (length(prop) == 1) {
+    prop <- rep(prop, 2)
   }
   # target variable as double:
   dfGeneric$target <- as.double(dfGeneric$target) - 1
@@ -889,7 +825,7 @@ getGenericTrainValTestData <- function(dfGeneric = NULL,
   i <- sapply(dfGeneric, is.factor)
   dfGeneric[i] <- lapply(dfGeneric[i], as.character)
   ## first split between training and testing sets
-  if(prop[1] == 1){
+  if (prop[1] == 1) {
     trainGeneric <- dfGeneric
     testGeneric <- NULL
   } else{
@@ -898,7 +834,7 @@ getGenericTrainValTestData <- function(dfGeneric = NULL,
     testGeneric <- testing(splitGeneric)
   }
   # split the training set into validation and training
-  if(prop[2] == 1){
+  if (prop[2] == 1) {
     valGeneric <- NULL
   } else{
     splitGeneric <- initial_split(trainGeneric, prop = prop[2])
@@ -906,9 +842,11 @@ getGenericTrainValTestData <- function(dfGeneric = NULL,
     valGeneric <- testing(splitGeneric)
   }
 
-  res <- list(trainGeneric = trainGeneric,
-              valGeneric = valGeneric,
-              testGeneric = testGeneric)
+  res <- list(
+    trainGeneric = trainGeneric,
+    valGeneric = valGeneric,
+    testGeneric = testGeneric
+  )
 }
 
 #' @title Select target variable in a data frame
@@ -922,7 +860,7 @@ getGenericTrainValTestData <- function(dfGeneric = NULL,
 #' df <- selectTarget(df=df, target="y")
 #'
 #' @export
-selectTarget <- function(df, target){
+selectTarget <- function(df, target) {
   df$target <- df[[target]]
   df[[target]] <- NULL
   return(df)

@@ -4,10 +4,10 @@
 \alias{genCatsDogsData}
 \title{generate Cats Dogs Data}
 \usage{
-genCatsDogsData(kConf = getKerasConf())
+genCatsDogsData(kerasConf = getKerasConf())
 }
 \arguments{
-\item{kConf}{keras configuration. Default: \code{kConf = \link{getKerasConf}}}
+\item{kerasConf}{keras configuration. Default: \code{kerasConf = \link{getKerasConf}}}
 }
 \value{
 list with test, validation, and test data

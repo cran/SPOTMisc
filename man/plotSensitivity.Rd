@@ -40,7 +40,7 @@ plotSensitivity(
 ggplot2 visualization
 }
 \description{
-Sensitivity ggplot of a model
+Generates a sensitivity plot.
 }
 \seealso{
 \code{\link[SPOT]{plotFunction}},

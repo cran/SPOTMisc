@@ -4,9 +4,19 @@
 \alias{getModelConf}
 \title{Get model configuration}
 \usage{
-getModelConf(model, task.type = NULL, nFeatures = NULL)
+getModelConf(
+  modelArgs = NULL,
+  model,
+  task.type = NULL,
+  nFeatures = NULL,
+  active = NULL
+)
 }
 \arguments{
+\item{modelArgs}{list with information about model, active variables etc. Note:
+\code{argList} will replace the other arguments. Use \code{argList$model} instead
+of \code{model} etc.}
+
 \item{model}{machine or deep learning model (character). One of the following:
 \describe{
     \item{\code{"cvglmnet"}}{glm net.}
@@ -15,11 +25,15 @@ getModelConf(model, task.type = NULL, nFeatures = NULL)
     \item{\code{"rpart"}}{recursive partitioning and  regression trees, \code{\link[rpart]{rpart}}}
     \item{\code{"svm"}}{support vector machines.}
     \item{\code{"xgboost"}}{gradient boosting, \code{\link[xgboost]{xgb.train}}.}
-    \item{\code{"dl"}}{deep learning}}}
+    \item{\code{"dl"}}{deep learning: dense network.}
+    \item{\code{"cnn"}}{deep learning: convolutionary network}.}}
 
 \item{task.type}{character, either \code{"classif"} or \code{"regr"}.}
 
 \item{nFeatures}{number of features, e.g., \code{sum(task$task.desc$n.feat)}}
+
+\item{active}{vector of activated tunepars, e.g., \code{c("minsplit", "maxdepth")}
+for model \code{"rpart"}}
 }
 \value{
 Returns returns a list of the
@@ -41,8 +55,17 @@ Configure machine and deep learning models
 \examples{
 # Get hyperparameter names and their defaults for fitting a
 # (recursive partitioning and  regression trees) model:
-cfg <- getModelConf("rpart")
+modelArgs <- list(model = "rpart")
+cfg <- getModelConf(modelArgs)
 cfg$tunepars
 cfg$defaults
+## do not use anymore:
+cfg <- getModelConf(model="rpart")
+cfg$tunepars
+cfg$defaults
+modelArgs <- list(model="rpart", active = c("minsplit", "maxdepth"))
+cfgAct <- getModelConf(modelArgs)
+cfgAct$tunepars
+cfgAct$defaults
 
 }

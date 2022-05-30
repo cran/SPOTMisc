@@ -17,3 +17,10 @@ Parameter values can be translated,
 implements the multiplication (transformation), i.e., x is mapped
 to round(2x).
 }
+\examples{
+f2 <- function(x){2^x}
+fn <- c("identity", "exp", "f2")
+xNat <- diag(3)
+SPOT::transformX(xNat, fn)
+
+}

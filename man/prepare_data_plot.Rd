@@ -39,5 +39,5 @@ Default is an empty list (use default model controls).}
 list with plotting data and information
 }
 \description{
-mlrTools
+Data preparation
 }

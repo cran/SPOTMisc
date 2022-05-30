@@ -16,3 +16,10 @@ trans_10pow(x)
 Parameter values can be translated,
 e.g., to base 10.
 }
+\examples{
+f2 <- function(x){2^x}
+fn <- c("identity", "exp", "f2")
+xNat <- diag(3)
+SPOT::transformX(xNat, fn)
+
+}

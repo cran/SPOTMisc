@@ -73,7 +73,7 @@ Predict deep learning models on Census data
 ### June 2021. http://arxiv.org/abs/2105.14625.
 PYTHON_RETICULATE = FALSE
 if(PYTHON_RETICULATE){
-cfg <- getModelConf("dl")
+cfg <- getModelConf(list(model="dl"))
 x <- matrix(cfg$defaults, nrow=1)
 res <- predDlCensus(x=x, k=2)
 }
