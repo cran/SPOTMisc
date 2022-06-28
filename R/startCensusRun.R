@@ -34,7 +34,7 @@
 #' @param krigingTarget "ei"
 #' @param krigingUseLambda TRUE
 #' @param krigingReinterpolate FALSE
-#' @param defaultAsStartingPoint FALSE
+#' @param defaultAsStartingPoint TRUE
 #' @param plots  FALSE
 #' @param Rinit 2
 #' @param replicates 2
@@ -53,7 +53,7 @@
 #' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 #' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 #' ### June 2021. http://arxiv.org/abs/2105.14625.
-#' PYTHON_RETICULATE = FALSE
+#' PYTHON_RETICULATE <- FALSE
 #' if(PYTHON_RETICULATE){
 #' library("dplyr")
 #' library("farff")
@@ -106,7 +106,7 @@ startCensusRun <- function(modelList = list("dl", "cvglmnet",  "kknn",   "ranger
                           imputeCriteriaFuns = list(is.infinite, is.na, is.nan),
                           krigingTarget =  "ei",
                           krigingUseLambda =  TRUE,
-                          krigingReinterpolate =  TRUE,
+                          krigingReinterpolate =  FALSE,
                           defaultAsStartingPoint =  TRUE,
                           plots =  FALSE,
                           Rinit =  2,

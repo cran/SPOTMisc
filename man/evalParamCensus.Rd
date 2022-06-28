@@ -59,7 +59,7 @@ evaluate hyperparameter config on census data
 ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 ### June 2021. http://arxiv.org/abs/2105.14625.
-PYTHON_RETICULATE = FALSE
+PYTHON_RETICULATE <- FALSE
 if(PYTHON_RETICULATE){
 ## The following code was used to evaluate the results in the book
 ## "Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide"

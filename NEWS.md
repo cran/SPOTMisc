@@ -1,5 +1,29 @@
 # SPOTMisc
 
+## 1.19.40
+* NEW:
+  * getModelConf: number of units modified: 0;5 (1;32)
+
+## 1.19.38
+* NEW:
+  * further tests tfdatasets
+
+## 1.19.36
+* NEW:
+  * funKerasGeneric: embedding enhanced
+
+## 1.19.32
+* BUGFIX:
+  "mace" -> "race" in Census Data
+
+## 1.19.30
+* BUGFIX:
+  *funKerasGeneric: embedding corrected
+
+## 1.19.28
+* BUGFIX:
+  * xgboost added to suggests in DESCRIPTION
+
 ## 1.19.26
 * NEWS:
   * new function trans_odd_round()

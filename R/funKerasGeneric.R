@@ -312,7 +312,7 @@ kerasFit <- function(model,
 #' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 #' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 #' ### June 2021. http://arxiv.org/abs/2105.14625.
-#' PYTHON_RETICULATE = FALSE
+#' PYTHON_RETICULATE <- FALSE
 #' if(PYTHON_RETICULATE){
 #'
 #' ## data preparation
@@ -392,6 +392,9 @@ funKerasGeneric <-  function (x,
 #' @title Create an input pipeline using tfdatasets
 #' @param batch_size batch size. Default: 32
 #' @param data data. List, e.g., df$trainCensus, df$testGeneric, and df$valCensus data)
+#' @param minLevelSizeEmbedding integer. Embedding will be used for
+#' factor variables with more than \code{minLevelSizeEmbedding} levels. Default: \code{100}.
+#' @param embeddingDim integer. Dimension used for embedding. Default: \code{floor(log(minLevelSizeEmbedding))}.
 #'
 #' @importFrom tfdatasets tensor_slices_dataset
 #' @importFrom tfdatasets dataset_shuffle
@@ -405,7 +408,10 @@ funKerasGeneric <-  function (x,
 #' @importFrom tfdatasets fit
 #' @importFrom tfdatasets step_indicator_column
 #' @importFrom tfdatasets step_embedding_column
+#' @importFrom tfdatasets matches
 #' @importFrom magrittr %>%
+#' @importFrom dplyr select_if
+#' @importFrom dplyr mutate_if
 #'
 #' @examples
 #' \donttest{
@@ -413,7 +419,7 @@ funKerasGeneric <-  function (x,
 #' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 #' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 #' ### June 2021. http://arxiv.org/abs/2105.14625.
-#' PYTHON_RETICULATE = FALSE
+#' PYTHON_RETICULATE <- FALSE
 #' if(PYTHON_RETICULATE){
 #' target <- "age"
 #' batch_size <- 32
@@ -443,7 +449,12 @@ funKerasGeneric <-  function (x,
 #' }
 #' @export
 genericDataPrep <- function(data,
-                            batch_size = 32) {
+                            batch_size = 32,
+                            minLevelSizeEmbedding = 100,
+                            embeddingDim = NULL) {
+  if(is.null(embeddingDim)){
+    embeddingDim <- floor(log(minLevelSizeEmbedding))
+  }
   train_ds_generic <- val_ds_generic <- test_ds_generic <- NULL
 
   df_to_dataset <- function(df,
@@ -473,16 +484,28 @@ genericDataPrep <- function(data,
   #   reticulate::as_iterator() %>%
   #   reticulate::iter_next()
 
+  # factorVars <-  names(data[,sapply(data, is.factor)])
+  df <- rbind(data$trainGeneric, data$valGeneric)
+  embeddingVars <- names(df %>% mutate_if(is.character, factor) %>% select_if(~ is.factor(.) & nlevels(.) > minLevelSizeEmbedding))
+  noEmbeddingVars <- names(df %>% mutate_if(is.character, factor) %>% select_if(~ is.factor(.) & nlevels(.) <= minLevelSizeEmbedding))
+
   specGeneric <- feature_spec(train_ds_generic, target ~ .)
+
+  # specGeneric <- specGeneric %>%
+  #   step_numeric_column(all_numeric(),
+  #                       normalizer_fn = scaler_standard()) %>%
+  #   step_categorical_column_with_vocabulary_list(all_nominal())
+  #
+  # specGeneric <- specGeneric %>%
+  #   step_indicator_column(all_nominal()) %>%
+  #   step_embedding_column(all_nominal(), dimension = 2)
 
   specGeneric <- specGeneric %>%
     step_numeric_column(all_numeric(),
                         normalizer_fn = scaler_standard()) %>%
-    step_categorical_column_with_vocabulary_list(all_nominal())
-
-  specGeneric <- specGeneric %>%
-    step_indicator_column(all_nominal()) %>%
-    step_embedding_column(all_nominal(), dimension = 2)
+    step_categorical_column_with_vocabulary_list(all_nominal()) %>%
+    step_indicator_column(matches(noEmbeddingVars)) %>%
+    step_embedding_column(matches(embeddingVars), dimension = embeddingDim)
 
   specGeneric_prep <- fit(specGeneric)
 
@@ -545,7 +568,7 @@ kerasReturnDummy <- function(kerasConf) {
 #' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 #' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 #' ### June 2021. http://arxiv.org/abs/2105.14625.
-#' PYTHON_RETICULATE = FALSE
+#' PYTHON_RETICULATE <- FALSE
 #' if(PYTHON_RETICULATE){
 #' target <- "age"
 #' nobs <- 1000
@@ -602,7 +625,7 @@ getSimpleKerasModel <- function(specList,
 #' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 #' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 #' ### June 2021. http://arxiv.org/abs/2105.14625.
-#' PYTHON_RETICULATE = FALSE
+#' PYTHON_RETICULATE <- FALSE
 #' if(PYTHON_RETICULATE){
 #' library(tfdatasets)
 #' library(keras)
@@ -790,7 +813,7 @@ prepareProgressPlot <- function(modelList,
 #' ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 #' ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 #' ### June 2021. http://arxiv.org/abs/2105.14625.
-#' PYTHON_RETICULATE = FALSE
+#' PYTHON_RETICULATE <- FALSE
 #' if(PYTHON_RETICULATE){
 #' task.type <- "classif"
 #' nobs <- 1e4

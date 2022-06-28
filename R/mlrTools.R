@@ -160,6 +160,7 @@ getObjf <- function(config, timeout = 3600) {
   }
   force(objfun)
   objvecf <- function(x, seed) {
+    # print(paste0("seed: ", seed))
     res <- NULL
     for (i in 1:nrow(x))
       res <- rbind(res, objfun(x[i, , drop = FALSE], seed[i]))
@@ -303,7 +304,7 @@ getMlrResample <- function(task,
                      size = getTaskSize(task) * prop,
                      replace = FALSE)
   test.id <- (1:getTaskSize(task))[-train.id]
-  rsmpl = makeFixedHoldoutInstance(train.id,
+  rsmpl <- makeFixedHoldoutInstance(train.id,
                                    test.id,
                                    getTaskSize(task))
   return(rsmpl)

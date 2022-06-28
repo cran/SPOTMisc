@@ -4,12 +4,22 @@
 \alias{genericDataPrep}
 \title{Create an input pipeline using tfdatasets}
 \usage{
-genericDataPrep(data, batch_size = 32)
+genericDataPrep(
+  data,
+  batch_size = 32,
+  minLevelSizeEmbedding = 100,
+  embeddingDim = NULL
+)
 }
 \arguments{
 \item{data}{data. List, e.g., df$trainCensus, df$testGeneric, and df$valCensus data)}
 
 \item{batch_size}{batch size. Default: 32}
+
+\item{minLevelSizeEmbedding}{integer. Embedding will be used for
+factor variables with more than \code{minLevelSizeEmbedding} levels. Default: \code{100}.}
+
+\item{embeddingDim}{integer. Dimension used for embedding. Default: \code{floor(log(minLevelSizeEmbedding))}.}
 }
 \value{
 a fitted \code{FeatureSpec} object and the hold-out testGeneric (=data$testGeneric).
@@ -31,7 +41,7 @@ Create an input pipeline using tfdatasets
 ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 ### June 2021. http://arxiv.org/abs/2105.14625.
-PYTHON_RETICULATE = FALSE
+PYTHON_RETICULATE <- FALSE
 if(PYTHON_RETICULATE){
 target <- "age"
 batch_size <- 32

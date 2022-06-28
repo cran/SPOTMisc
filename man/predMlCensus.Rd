@@ -41,7 +41,7 @@ Default: \code{NULL}.}
 
 \item{cardinality}{(character) cardinality}
 
-\item{cachedir}{cachedie}
+\item{cachedir}{cachedir}
 
 \item{k}{number of repeats}
 

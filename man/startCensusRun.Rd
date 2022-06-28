@@ -36,7 +36,7 @@ startCensusRun(
   imputeCriteriaFuns = list(is.infinite, is.na, is.nan),
   krigingTarget = "ei",
   krigingUseLambda = TRUE,
-  krigingReinterpolate = TRUE,
+  krigingReinterpolate = FALSE,
   defaultAsStartingPoint = TRUE,
   plots = FALSE,
   Rinit = 2,
@@ -111,7 +111,7 @@ startCensusRun(
 
 \item{krigingReinterpolate}{FALSE}
 
-\item{defaultAsStartingPoint}{FALSE}
+\item{defaultAsStartingPoint}{TRUE}
 
 \item{plots}{FALSE}
 
@@ -132,7 +132,7 @@ Runs to compare standard machine learning and deep learning models
 ### Bartz-Beielstein, T., Rehbach, F., Sen, A., and Zaefferer, M.:
 ### Surrogate Model Based Hyperparameter Tuning for Deep Learning with SPOT,
 ### June 2021. http://arxiv.org/abs/2105.14625.
-PYTHON_RETICULATE = FALSE
+PYTHON_RETICULATE <- FALSE
 if(PYTHON_RETICULATE){
 library("dplyr")
 library("farff")

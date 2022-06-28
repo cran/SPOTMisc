@@ -1,7 +1,7 @@
-context("FunKerasModular")
+context("FunKerasGeneric")
 skip_on_cran()
 
-test_that("check funKerasModular: does resDummy work?", {
+test_that("check funKerasGeneric: does resDummy work?", {
   target <- "age"
   nobs <- 100
   batch_size <- 32
