@@ -24,7 +24,7 @@ Hyperparameter Tuning: Generic Classification Objective Function.
 \details{
 Trains a simple deep NN on arbitrary data sets.
 Provides a template that can be used for other networks as well.
-Standard Code from \url{https://keras.rstudio.com/}
+Standard Code from \url{https://tensorflow.rstudio.com/}
 Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 
 Note: The WARNING "tensorflow:Layers in a Sequential model should only have a single input tensor.

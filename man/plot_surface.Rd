@@ -9,8 +9,8 @@ plot_surface(
   which = if (ncol(object$x) > 1 & tolower(type) != "singledim") {
      1:2
  } else {
- 
-       1
+   
+     1
  },
   constant = object$x[which.min(unlist(object$y)), ],
   xlab = paste("x", which, sep = ""),

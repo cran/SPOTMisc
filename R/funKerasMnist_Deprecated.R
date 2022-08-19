@@ -4,7 +4,7 @@
 #'
 #' @details Trains a simple deep NN on the MNIST dataset.
 #' Provides a template that can be used for other networks as well.
-#' Standard Code from https://keras.rstudio.com/
+#' Standard Code from https://tensorflow.rstudio.com/
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @param x matrix of hyperparameter values to evaluate with the function.
@@ -123,7 +123,7 @@ funKerasMnist_0 <-
 #' @description Hyperparameter Tuning: Keras MNIST Classification Test Function.
 #'
 #' @details Trains a simple deep NN on the MNIST dataset.
-#' Standard Code from https://keras.rstudio.com/
+#' Standard Code from https://tensorflow.rstudio.com/
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @param x matrix of hyperparameter values to evaluate with the function.

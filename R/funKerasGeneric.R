@@ -1,7 +1,7 @@
 #' @title evalKerasGeneric model building and compile
 #' @description Hyperparameter Tuning: Keras Generic Classification Function.
 #' @details Trains a simple deep NN on a generic data set.
-#' Standard Code from \url{https://keras.rstudio.com/}.
+#' Standard Code from \url{https://tensorflow.rstudio.com/}.
 #' Modified by T. Bartz-Beielstein.
 #' @param x matrix of transformed hyperparameter values to evaluate with the function.
 #' If \code{NULL}, a simple keras model will be build, which is considered default
@@ -72,7 +72,9 @@ evalKerasGeneric <-  function(x = NULL,
   model <- y$model
   history <- y$history
   if (kerasConf$returnObject == "model") {
-    return(model)
+    ## changed in 1.19.46: return y instead of only the model
+    # return(model)
+    return(y)
   }
   # evaluate on test data
   pred <- predict(model, specList$testGeneric)
@@ -114,7 +116,7 @@ evalKerasGeneric <-  function(x = NULL,
 #' @description Hyperparameter Tuning: Keras Generic Classification Function.
 #'
 #' @details Trains a simple deep NN on a generic data set.
-#' Standard Code from \url{https://keras.rstudio.com/}
+#' Standard Code from \url{https://tensorflow.rstudio.com/}
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @param FLAGS flags. list of hyperparameter values.
@@ -219,7 +221,7 @@ kerasBuildCompile <-  function(FLAGS,
 #' @description Hyperparameter Tuning: Keras Generic Classification Function.
 #'
 #' @details Trains a simple deep NN on a generic data set.
-#' Standard Code from \url{https://keras.rstudio.com/}
+#' Standard Code from \url{https://tensorflow.rstudio.com/}
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @param model model
@@ -276,7 +278,7 @@ kerasFit <- function(model,
 #'
 #' @details Trains a simple deep NN on arbitrary data sets.
 #' Provides a template that can be used for other networks as well.
-#' Standard Code from \url{https://keras.rstudio.com/}
+#' Standard Code from \url{https://tensorflow.rstudio.com/}
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' Note: The WARNING "tensorflow:Layers in a Sequential model should only have a single input tensor.
@@ -766,8 +768,7 @@ prepareProgressPlot <- function(modelList,
       }
       maxY <- min(maxY, length(result$y))
       result$y <- result$y[1:maxY, 1]
-      ## FIXME: add information about initial number of replicates (Rinit):
-      size <- result$control$designControl$size
+      size <- result$control$designControl$size * result$control$designControl$replicates
       dfRun <- rbind(dfRun,
                      data.frame(
                        x = 1:maxY,

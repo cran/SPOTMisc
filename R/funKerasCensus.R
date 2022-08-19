@@ -41,51 +41,56 @@ predMlCensus <- function(x = NULL,
                          cardinality = "high",
                          cachedir = "oml.cache",
                          k = 1,
-                         prop = 2/3,
+                         prop = 2 / 3,
                          verbosity = 0) {
   trueY <- NULL # matrix(NA, ncol=k,)
   hatY  <- NULL # matrix(NA, ncol=k,)
   for (i in 1:k) {
     data.seed <- i
-    dfCensus <- getDataCensus(task.type = task.type,
-                             nobs = nobs,
-                             nfactors = nfactors,
-                             nnumericals = nnumericals,
-                             cardinality = cardinality,
-                             data.seed= data.seed,
-                             cachedir = cachedir,
-                             target = target)
-   task <- getMlrTask(dataset = dfCensus,
+    dfCensus <- getDataCensus(
+      task.type = task.type,
+      nobs = nobs,
+      nfactors = nfactors,
+      nnumericals = nnumericals,
+      cardinality = cardinality,
+      data.seed = data.seed,
+      cachedir = cachedir,
+      target = target
+    )
+    task <- getMlrTask(dataset = dfCensus,
                        task.type = task.type,
                        data.seed = data.seed)
     # number of features in task:
     nFeatures <- sum(task$task.desc$n.feat)
-    cfg <- getModelConf(list(task.type = task.type,
-                        model = model,
-                        nFeatures = nFeatures))
+    cfg <- getModelConf(list(
+      task.type = task.type,
+      model = model,
+      nFeatures = nFeatures
+    ))
     # Handle dummy
     ## The model is known, so dummy information is available
     if (cfg$dummy) {
       task <- createDummyFeatures(task)
     }
-    rsmpl <- getMlrResample(task = task,
-                            dataset = dfCensus,
-                            data.seed = data.seed,
-                            prop = prop)
-    cfg <- append(cfg, list(
+    rsmpl <- getMlrResample(
       task = task,
-      resample = rsmpl
-    ))
+      dataset = dfCensus,
+      data.seed = data.seed,
+      prop = prop
+    )
+    cfg <- append(cfg, list(task = task,
+                            resample = rsmpl))
     cfg$prop <- prop
     # timeout set to NA (because this is the final eval)
-    predf <- getPredf(config=cfg,
-                      timeout=NA)
+    predf <- getPredf(config = cfg,
+                      timeout = NA)
 
     z <- predf(x, data.seed)
     res <- z[[7]][3]$data
     #z[[7]][3]$data$truth
     #z[[7]][3]$data$response
-    trueY <- cbind(trueY, as.matrix(as.integer(res$truth) -1, ncol = 1))
+    trueY <-
+      cbind(trueY, as.matrix(as.integer(res$truth) - 1, ncol = 1))
     hatY  <- cbind(hatY, as.matrix(as.double(res$response) - 1,
                                    ncol = 1))
   } # end for loop
@@ -144,7 +149,7 @@ predDlCensus <- function(x = NULL,
                          cardinality = "high",
                          cachedir = "oml.cache",
                          k = 1,
-                         prop = 2/3,
+                         prop = 2 / 3,
                          batch_size = 32,
                          verbosity = 0) {
   hatY <- trueY <- NULL # matrix(NA, ncol=k,)
@@ -169,12 +174,14 @@ predDlCensus <- function(x = NULL,
   kerasConf <- getKerasConf()
   kerasConf$verbose <- verbosity
   kerasConf$returnObject <- "pred"
-  cfg <- getModelConf(list(model="dl"))
-  x <- matrix(x, nrow=1)
+  cfg <- getModelConf(list(model = "dl"))
+  x <- matrix(x, nrow = 1)
   transformFun <- cfg$transformations
   message("predDlCensus(): x before transformX().")
   print(x)
-  if (length(transformFun) > 0) {  x <- transformX(xNat=x, fn=transformFun)}
+  if (length(transformFun) > 0) {
+    x <- transformX(xNat = x, fn = transformFun)
+  }
   message("predDlCensus(): x after transformX().")
   print(x)
   for (i in 1:k) {
@@ -189,11 +196,12 @@ predDlCensus <- function(x = NULL,
       cachedir = cachedir,
       target = target
     )
-   data <- getGenericTrainValTestData(dfGeneric = dfCensus, prop = prop)
-   specList <- genericDataPrep(data=data, batch_size = batch_size)
-   pred <- evalKerasGeneric(x=x,
-                            kerasConf=kerasConf,
-                            specList = specList)
+    data <-
+      getGenericTrainValTestData(dfGeneric = dfCensus, prop = prop)
+    specList <- genericDataPrep(data = data, batch_size = batch_size)
+    pred <- evalKerasGeneric(x = x,
+                             kerasConf = kerasConf,
+                             specList = specList)
     #trueY <- cbind(trueY, as.matrix(dataFull$testGeneric$age, ncol = 1))
     trueY <-
       cbind(trueY, as.matrix(pred$trueY, ncol = 1))
@@ -269,18 +277,18 @@ getMlConfig <- function(target,
                         cardinality,
                         data.seed,
                         prop) {
-  task <- getMlrTask(
-    dataset = data,
-    task.type = task.type,
-    data.seed = data.seed
-  )
+  task <- getMlrTask(dataset = data,
+                     task.type = task.type,
+                     data.seed = data.seed)
 
   # number of features in task:
   nFeatures <- sum(task$task.desc$n.feat)
 
-  cfg <- getModelConf(list(task.type = task.type,
-                      model = model,
-                      nFeatures = nFeatures))
+  cfg <- getModelConf(list(
+    task.type = task.type,
+    model = model,
+    nFeatures = nFeatures
+  ))
   # Handle dummy
   ## The model is known, so dummy information is available
   if (cfg$dummy) {
@@ -342,22 +350,20 @@ getMlConfig <- function(target,
 #' }}
 #' @export
 #'
-evalParamCensus <- function(
-    runNr = "00",
-    model = "dl",
-    xbest = "xBestOcba",
-    k = 30,
-    directory = "data",
-    target = "age",
-    cachedir = "oml.cache",
-    task.type = "classif",
-    nobs = 1e4,
-    nfactors = "high",
-    nnumericals = "high",
-    cardinality = "high",
-    prop = 2/3,
-    verbosity = 0
-)
+evalParamCensus <- function(runNr = "00",
+                            model = "dl",
+                            xbest = "xBestOcba",
+                            k = 30,
+                            directory = "data",
+                            target = "age",
+                            cachedir = "oml.cache",
+                            task.type = "classif",
+                            nobs = 1e4,
+                            nfactors = "high",
+                            nnumericals = "high",
+                            cardinality = "high",
+                            prop = 2 / 3,
+                            verbosity = 0)
 {
   # FIXME: remove after testing:
   # runNr <- "Default"
@@ -382,7 +388,8 @@ evalParamCensus <- function(
     nnumericals = nnumericals,
     cardinality = cardinality,
     cachedir = cachedir,
-    target = target)
+    target = target
+  )
 
   task <- getMlrTask(dataset = dfCensus,
                      task.type = task.type,
@@ -395,16 +402,18 @@ evalParamCensus <- function(
   result <- NULL
   ## get hyperparameter config x:
   if (runNr == "Default") {
-    x <- getModelConf(list(model = model,
-                      task.type = task.type,
-                      nFeatures = nFeatures))$defaults
+    x <- getModelConf(list(
+      model = model,
+      task.type = task.type,
+      nFeatures = nFeatures
+    ))$defaults
   } else{
-    load(paste0(directory,"/", model, runNr, ".RData"))
+    load(paste0(directory, "/", model, runNr, ".RData"))
     x <- result[[xbest]]
   }
   x <- matrix(x, nrow = 1, ncol = length(x))
   ## dl evaluation:
-  if(model == "dl"){
+  if (model == "dl") {
     val <- predDlCensus(
       x = x,
       target = target,
@@ -447,6 +456,10 @@ evalParamCensus <- function(
 #' @param runNrMl run number (character) of ml models
 #' @param runNrDl run number (character) of dl models
 #' @param directory location of the (non-default, e.g., tuned) parameter file
+#' @param defaultModelList default model list. Default: \code{list("dl", "cvglmnet", "kknn",
+#' "ranger", "rpart" ,  "svm", "xgboost")}
+#' @param tunedModelList tuned model list. Default: \code{list("dl", "cvglmnet", "kknn",
+#' "ranger", "rpart" ,  "svm", "xgboost")}
 #' @returns data frame with results:
 #' \describe{
 #'		\item{\code{x}}{integer representing step}
@@ -476,38 +489,62 @@ evalParamCensus <- function(
 #'
 prepareComparisonPlot <- function(runNrMl,
                                   runNrDl,
-                                  directory){
+                                  directory,
+                                  defaultModelList =
+                                    list("dl", "cvglmnet",  "kknn",
+                                         "ranger", "rpart" ,  "svm",
+                                         "xgboost"),
+                                  tunedModelList =
+                                    list("dl", "cvglmnet",  "kknn",
+                                         "ranger", "rpart" ,  "svm",
+                                         "xgboost")) {
   score <- NULL
-  dfRun1 <- data.frame(x=NULL, y=NULL, name=NULL)
-  dfRun2 <- data.frame(x=NULL, y=NULL, name=NULL)
-  dfRun3 <- data.frame(x=NULL, y=NULL, name=NULL)
-  dfRun <- data.frame(x=NULL, y=NULL, name=NULL)
-  modelList <- list("dl", "cvglmnet",  "kknn",   "ranger", "rpart" ,  "svm", "xgboost")
-  for (model in modelList) {
+  dfRun1 <- data.frame(x = NULL, y = NULL, name = NULL)
+  dfRun2 <- data.frame(x = NULL, y = NULL, name = NULL)
+  dfRun3 <- data.frame(x = NULL, y = NULL, name = NULL)
+  dfRun <- data.frame(x = NULL, y = NULL, name = NULL)
+  for (model in defaultModelList) {
     load(paste0(directory, "/", model, "DefaultEvaluation.RData"))
     dfRun1 <- rbind(dfRun1,
-                    data.frame(x = 1:dim(score)[1],
-                               y = score[,2],
-                               name= paste0(model,"D")))
+                    data.frame(
+                      x = 1:dim(score)[1],
+                      y = score[, 2],
+                      name = paste0(model, "D")
+                    ))
   }
-  modelList <- list("cvglmnet",  "kknn",   "ranger", "rpart" ,  "svm", "xgboost")
+  mlModelList <-
+    list("cvglmnet",  "kknn",   "ranger", "rpart" ,  "svm", "xgboost")
+  modelList <-
+    tunedModelList[which((tunedModelList %in% mlModelList))]
+
   for (model in modelList) {
     load(paste0(directory, "/", model, runNrMl, "Evaluation.RData"))
     dfRun2 <- rbind(dfRun2,
-                    data.frame(x = 1:dim(score)[1],
-                               y = score[,2],
-                               name= paste0(model,"T")))
+                    data.frame(
+                      x = 1:dim(score)[1],
+                      y = score[, 2],
+                      name = paste0(model, "T")
+                    ))
   }
   # add dl run
-  model = "dl"
-  load(paste0(directory, "/", model, runNrDl, "Evaluation.RData"))
-  dfRun3 <- rbind(dfRun3,
-                  data.frame(x = 1:dim(score)[1],
-                             y = score[,2],
-                             name= paste0(model,"T")))
-  dfRun <- rbind(dfRun1, dfRun2, dfRun3)
-  attr(dfRun,"ymin") <- min(dfRun$y)
+  dlModelList <- list("dl")
+  dlModelList <-
+    tunedModelList[which((tunedModelList %in% dlModelList))]
+  if (length(dlModelList) > 0) {
+    for (model in dlModelList) {
+      load(paste0(directory, "/", model, runNrDl, "Evaluation.RData"))
+      dfRun3 <- rbind(dfRun3,
+                      data.frame(
+                        x = 1:dim(score)[1],
+                        y = score[, 2],
+                        name = paste0(model, "T")
+                      ))
+      dfRun <- rbind(dfRun1, dfRun2, dfRun3)
+    }
+  }
+  else{
+    dfRun <- rbind(dfRun1, dfRun2)
+  }
+  attr(dfRun, "ymin") <- min(dfRun$y)
   return(dfRun)
 }
-
-

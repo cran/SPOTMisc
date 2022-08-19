@@ -391,9 +391,9 @@ getModelConf <- function(modelArgs=NULL,
                   "layers",
                   "epsilon",
                   "optimizer")
-    lower <-   c(0,  0.5,  0, 0.25, 1e-6, 3, 0.9,  0.99,   1, 1e-9, 1)
-    defaults <- c(0,    0,  5,  0.5, 1e-3, 4, 0.9,  0.999,  1, 1e-7, 5)
-    upper <-   c(0.4,  1,  5,    1, 1e-2, 7, 0.99, 0.9999, 4, 1e-8, 7)
+    lower <-   c(0,  0,  0, 0.25, 1e-6, 3, 0.9,  0.99,   1, 1e-9, 1)
+    defaults <- c(0,  0,  5,  0.5, 1e-3, 4, 0.9,  0.999,  1, 1e-7, 5)
+    upper <-   c(0.4, 0.5,  5,    1, 1e-2, 7, 0.99, 0.9999, 4, 1e-8, 7)
 
     type <-  rep("numeric", length(lower))
     type[c(3, 6, 9)] <- "integer"

@@ -116,7 +116,7 @@ printf <- function(...){
 #' @param kerasConf keras configuration. Default: \code{kerasConf = \link{getKerasConf}}
 #'
 #' @details
-#' Standard Data from https://keras.rstudio.com/
+#' Standard Data from https://tensorflow.rstudio.com/
 #' Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 #'
 #' @return list with test, validation, and test data

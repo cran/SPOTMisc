@@ -16,6 +16,6 @@ list with test, validation, and test data
 Generate data for \code{\link{funKerasTransferLearning}}
 }
 \details{
-Standard Data from https://keras.rstudio.com/
+Standard Data from https://tensorflow.rstudio.com/
 Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 }

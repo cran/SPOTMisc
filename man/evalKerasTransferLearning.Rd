@@ -31,7 +31,7 @@ Hyperparameter Tuning: Keras TransferLearning Test Function.
 }
 \details{
 Trains a transfer learning model.
-Standard Code from https://keras.rstudio.com/
+Standard Code from https://tensorflow.rstudio.com/
 Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 }
 \examples{

@@ -28,7 +28,7 @@ Hyperparameter Tuning: Keras Generic Classification Function.
 }
 \details{
 Trains a simple deep NN on a generic data set.
-Standard Code from \url{https://keras.rstudio.com/}
+Standard Code from \url{https://tensorflow.rstudio.com/}
 Modified by T. Bartz-Beielstein (tbb@bartzundbartz.de)
 }
 \seealso{

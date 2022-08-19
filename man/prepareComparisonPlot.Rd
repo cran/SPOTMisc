@@ -4,7 +4,13 @@
 \alias{prepareComparisonPlot}
 \title{prepare data frame for comparisons (boxplots, violin plots)}
 \usage{
-prepareComparisonPlot(runNrMl, runNrDl, directory)
+prepareComparisonPlot(
+  runNrMl,
+  runNrDl,
+  directory,
+  defaultModelList = list("dl", "cvglmnet", "kknn", "ranger", "rpart", "svm", "xgboost"),
+  tunedModelList = list("dl", "cvglmnet", "kknn", "ranger", "rpart", "svm", "xgboost")
+)
 }
 \arguments{
 \item{runNrMl}{run number (character) of ml models}
@@ -12,6 +18,12 @@ prepareComparisonPlot(runNrMl, runNrDl, directory)
 \item{runNrDl}{run number (character) of dl models}
 
 \item{directory}{location of the (non-default, e.g., tuned) parameter file}
+
+\item{defaultModelList}{default model list. Default: \code{list("dl", "cvglmnet", "kknn",
+"ranger", "rpart" ,  "svm", "xgboost")}}
+
+\item{tunedModelList}{tuned model list. Default: \code{list("dl", "cvglmnet", "kknn",
+"ranger", "rpart" ,  "svm", "xgboost")}}
 }
 \value{
 data frame with results:

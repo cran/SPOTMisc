@@ -1,5 +1,23 @@
 # SPOTMisc
 
+## 1.19.50
+* URL: https://keras.rstudio.com/ (moved to https://tensorflow.rstudio.com/)
+
+## 1.19.48
+* prepareComparisonPlot accepts extended parameter list: 
+  * defaultModelList and tunedModelList
+  
+## 1.19.46
+* kerasConf$returnObject == "model" returns y instead of only the model, i.e., y$model
+
+## 1.19.44
+* BUGFIX:
+  dropoutfac value in getModelConf() corrected: [0.5; 1] -> [0; 0.5]
+
+## 1.19.42
+* BUGFIX:
+  * prepareProgressPlot() uses information about initial number of replicates (Rinit)
+
 ## 1.19.40
 * NEW:
   * getModelConf: number of units modified: 0;5 (1;32)
