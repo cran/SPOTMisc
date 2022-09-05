@@ -26,7 +26,6 @@
 #'
 #' @return census data set
 #'
-#' @import OpenML
 #'
 #' @examples
 #' \donttest{
@@ -59,27 +58,36 @@ getDataCensus <- function(task.type="classif",
                           target = NULL,
                           cache.only = FALSE
                           ){
-  ## set API key to read only key
-  setOMLConfig(apikey = "c1994bdb7ecb3c6f3c8f3b35f4b47f1f",
-               cachedir = cachedir) # default cachedir is only temporary.
+  # NOTE:
+  # Since version == 1.19.52 the package OpenML is not imported any more,
+  # because it is not maintained on CRAN.
+  # If OpenML is available again, uncomment the following lines and rebuild the
+  # package:
+  #
+  # ## Check if package OpenML is installed:
+  # OpenMLInstalled <- system.file(package = "OpenML")
+  # if(nzchar(OpenMLInstalled)){
+  # ## set API key to read only key
+  # OpenML::setOMLConfig(apikey = "c1994bdb7ecb3c6f3c8f3b35f4b47f1f",
+  #              cachedir = cachedir) # default cachedir is only temporary.
+  # ## load CENSUS data
+  # dataset <- try(
+  #   OpenML::getOMLDataSet(data.id=4535,
+  #                 cache.only=cache.only)$data)
+  # }
+  #
+  # if(inherits(dataset, "try-error")){
+  #   dataset <- SPOTMisc::dataCensus
+  #   message("getOMLDataSet() failed: Using reduced local dataset 'dataCensus' from packae SPOTMisc.")
+  #   return(dataset)}
 
-  ## load CENSUS data
-
-
-  dataset <- try(
-    getOMLDataSet(data.id=4535,
-                  cache.only=cache.only)$data)
-
-  if(inherits(dataset, "try-error")){
-    dataset <- SPOTMisc::dataCensus
-    message("getOMLDataSet() failed: Using reduced local dataset 'dataCensus' from packae SPOTMisc.")
-    return(dataset)}
+  dataset <- SPOTMisc::dataCensusFull
 
   if(is.na(cardinality))
     cardinality <- "low"
 
-    #Note: for slightly better balance, we could also restrict the dataset to >18yold
-  #dataset <- subset(dataset,subset=V1>18)
+  # Note: for slightly better balance, we could also restrict the dataset to >18yold
+  # dataset <- subset(dataset,subset=V1>18)
 
   ## target column, to be ignored during task variation
   if(task.type=="classif"){

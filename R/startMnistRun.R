@@ -56,7 +56,6 @@
 #' library("tensorflow")
 #' library("Metrics")
 #' library("mlr")
-#' library("OpenML")
 #' library("reticulate")
 #' library("rpart")
 #' library("rpart.plot")

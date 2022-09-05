@@ -1,5 +1,12 @@
 # SPOTMisc
 
+## 1.19.52
+* OpenML dependency removed. Since version == 1.19.52 the package OpenML is not 
+  imported any more, because it is not maintained on CRAN.
+  If OpenML is available again, you can uncomment the lines in getDataCensus.R
+  and rebuild the package.
+  The census data set is included as dataCensusFull
+
 ## 1.19.50
 * URL: https://keras.rstudio.com/ (moved to https://tensorflow.rstudio.com/)
 

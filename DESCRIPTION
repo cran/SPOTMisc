@@ -1,7 +1,7 @@
 Package: SPOTMisc
 Type: Package
 Title: Misc Extensions for the 'SPOT' Package
-Version: 1.19.50
+Version: 1.19.52
 Authors@R: c(	
         person("Thomas", "Bartz-Beielstein", role = c("aut", "cre"), email = "tbb@bartzundbartz.de", comment = c(ORCID = "0000-0002-5938-5158")),
 				person("Martin", "Zaefferer", role = "aut", comment = c(ORCID = "0000-0003-2372-2092")),
@@ -20,21 +20,22 @@ License: GPL (>= 2)
 Encoding: UTF-8
 LazyLoad: yes
 LazyData: true
-Date: 2022-08-16
+LazyDataCompression: xz
+Date: 2022-08-31
 Depends: R (>= 4.0.0)
 RoxygenNote: 7.2.1
 Imports: callr, dplyr, ggplot2, GGally, graphics, grDevices, keras,
-        magrittr, mlr, Metrics, OpenML, plotly, RColorBrewer,
-        reticulate, rlang, rpart.plot, rsample, sensitivity, smoof,
-        SPOT, stats, tensorflow, tfdatasets, utils
+        magrittr, mlr, Metrics, plotly, RColorBrewer, reticulate,
+        rlang, rpart.plot, rsample, sensitivity, smoof, SPOT, stats,
+        tensorflow, tfdatasets, utils
 Suggests: farff, knitr, rmarkdown, rpart, testthat, xgboost
 URL: https://www.spotseven.de
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-08-16 14:58:47 UTC; bartz
+Packaged: 2022-08-31 18:55:18 UTC; bartz
 Author: Thomas Bartz-Beielstein [aut, cre]
     (<https://orcid.org/0000-0002-5938-5158>),
   Martin Zaefferer [aut] (<https://orcid.org/0000-0003-2372-2092>),
   Frederik Rehbach [aut] (<https://orcid.org/0000-0003-0922-8629>)
 Repository: CRAN
-Date/Publication: 2022-08-19 13:00:15 UTC
+Date/Publication: 2022-09-05 15:10:02 UTC

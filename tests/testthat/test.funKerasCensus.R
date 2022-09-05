@@ -57,7 +57,6 @@ test_that("check selectKerasOptimizer", {
   # library("GGally")
   # library("rsample")
   # library("tfdatasets")
-  # library("OpenML")
   # library("mlr")
   # library("plotly")
   # library("SPOT")

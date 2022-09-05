@@ -2,7 +2,6 @@ context("Census")
 skip_on_cran()
 
 test_that("split data correct?", {
-  library("OpenML")
   library("rsample")
 
   target <- "age"
